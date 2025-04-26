@@ -23,7 +23,6 @@ class TaskController extends Controller
     public function __construct(TaskService $taskService)
     {
         $this->taskService = $taskService;
-        $this->middleware('auth');
     }
 
     /**

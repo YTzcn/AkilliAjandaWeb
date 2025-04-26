@@ -62,12 +62,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class);
     }
-
-    /**
-     * Get the notes for the user.
-     */
-    public function notes(): HasMany
-    {
-        return $this->hasMany(Note::class);
-    }
 }

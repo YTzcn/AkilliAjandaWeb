@@ -1,6 +1,4 @@
-@extends('layouts.auth')
-
-@section('content')
+<x-auth>
     <div class="text-center mb-5">
         <h2 class="fw-bold mb-3">Hesap Oluştur</h2>
         <p class="text-muted">Ajandanızı yönetmek için ücretsiz hesap oluşturun</p>
@@ -58,4 +56,4 @@
             </a>
         </p>
     </div>
-@endsection 
+</x-auth> 

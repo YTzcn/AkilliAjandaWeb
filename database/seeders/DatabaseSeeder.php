@@ -67,27 +67,6 @@ class DatabaseSeeder extends Seeder
             'due_date' => now()->addDays(2),
             'is_completed' => true,
         ]);
-
-        // Demo için notlar oluştur
-        Note::create([
-            'user_id' => $user->id,
-            'title' => 'Toplantı Notları',
-            'content' => 'Proje ekibi ile yapılan toplantıda alınan kararlar:
-            1. Sprint planlaması güncellendi
-            2. Yeni özellikler önceliklendirildi
-            3. Bir sonraki toplantı önümüzdeki hafta Çarşamba günü yapılacak',
-        ]);
-
-        Note::create([
-            'user_id' => $user->id,
-            'title' => 'Alışveriş Listesi',
-            'content' => '- Ekmek
-            - Süt
-            - Yumurta
-            - Meyve
-            - Sebze',
-        ]);
-
         // Test kullanıcısı
         User::create([
             'name' => 'Test Kullanıcı',

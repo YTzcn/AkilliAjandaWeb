@@ -3,17 +3,16 @@
 namespace App\Providers;
 
 use App\Models\Event;
-use App\Models\Note;
 use App\Models\Task;
 use App\Models\User;
 use App\Repositories\EventRepository;
-use App\Repositories\NoteRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Services\EventService;
-use App\Services\NoteService;
 use App\Services\TaskService;
+use App\View\Components\CustomAuthLayout;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,7 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register repositories
+        // Repositories
+        $this->app->bind(UserRepository::class, function ($app) {
+            return new UserRepository($app->make(User::class));
+        });
+
         $this->app->bind(EventRepository::class, function ($app) {
             return new EventRepository($app->make(Event::class));
         });
@@ -32,15 +35,7 @@ class AppServiceProvider extends ServiceProvider
             return new TaskRepository($app->make(Task::class));
         });
 
-        $this->app->bind(NoteRepository::class, function ($app) {
-            return new NoteRepository($app->make(Note::class));
-        });
-
-        $this->app->bind(UserRepository::class, function ($app) {
-            return new UserRepository($app->make(User::class));
-        });
-
-        // Register services
+        // Services
         $this->app->bind(EventService::class, function ($app) {
             return new EventService(
                 $app->make(EventRepository::class)
@@ -52,12 +47,6 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(TaskRepository::class)
             );
         });
-
-        $this->app->bind(NoteService::class, function ($app) {
-            return new NoteService(
-                $app->make(NoteRepository::class)
-            );
-        });
     }
 
     /**
@@ -66,5 +55,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(!app()->isProduction());
+        
+        // Register custom blade components
+        Blade::component('custom-auth-layout', CustomAuthLayout::class);
     }
 }
