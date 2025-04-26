@@ -23,20 +23,27 @@ Route::get('/', function () {
     return redirect()->route('login');
 })->middleware('guest');
 
-// Dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// Özel middleware ile korunan rotalar
+Route::middleware(['ensure.auth'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Events
+    Route::resource('events', EventController::class);
+    Route::get('/events/date-range', [EventController::class, 'dateRange'])->name('events.date-range');
+    
+    // Tasks
+    Route::resource('tasks', TaskController::class);
+    Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
+    Route::patch('/tasks/{task}/pending', [TaskController::class, 'pending'])->name('tasks.pending');
+    
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
-// Events
-Route::resource('events', EventController::class);
-Route::get('/events/date-range', [EventController::class, 'dateRange'])->name('events.date-range');
-
-// Tasks
-Route::resource('tasks', TaskController::class);
-Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
-Route::patch('/tasks/{task}/pending', [TaskController::class, 'pending'])->name('tasks.pending');
-
-// Calendar API Routes
-Route::middleware('auth')->prefix('api/calendar')->group(function () {
+// Calendar API Routes - Özel middleware ile korunan api rotaları
+Route::middleware(['ensure.auth'])->prefix('api/calendar')->group(function () {
     // Events
     Route::get('/events', [ApiEventController::class, 'index']);
     Route::post('/events', [ApiEventController::class, 'store']);
@@ -49,10 +56,5 @@ Route::middleware('auth')->prefix('api/calendar')->group(function () {
     Route::put('/tasks/{task}', [ApiTaskController::class, 'update']);
     Route::delete('/tasks/{task}', [ApiTaskController::class, 'destroy']);
 });
-
-// Profile
-Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 require __DIR__.'/auth.php';
