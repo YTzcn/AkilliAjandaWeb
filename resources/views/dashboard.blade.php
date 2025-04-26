@@ -311,6 +311,31 @@
             display: none !important;
         }
     }
+
+    /* Widget Scroll Stilleri */
+    .widget-scroll {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .widget-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .widget-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+
+    .widget-scroll::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 2px;
+    }
+
+    .widget-scroll::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
 </style>
 @endsection
 
@@ -374,17 +399,17 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Yaklaşan Etkinlikler</h5>
-                    <a href="{{ route('events.create') }}" class="btn btn-sm btn-primary">
+                    <button type="button" class="btn btn-sm btn-primary" id="addEventButton">
                         <i class="bi bi-plus"></i> Yeni Ekle
-                    </a>
+                    </button>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if($upcomingEvents->isEmpty())
                         <p class="text-muted text-center my-5">Yaklaşan etkinlik bulunmuyor.</p>
                     @else
-                        <div class="list-group list-group-flush">
+                        <div class="list-group list-group-flush widget-scroll">
                             @foreach($upcomingEvents as $event)
-                                <div class="list-group-item border-0 ps-0">
+                                <div class="list-group-item border-0 px-3">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0 me-3">
                                             <div class="bg-primary bg-opacity-10 p-2 rounded text-center" style="min-width: 60px;">
@@ -399,6 +424,13 @@
                                                 {{ Carbon\Carbon::parse($event->start_date)->format('H:i') }} - 
                                                 {{ Carbon\Carbon::parse($event->end_date)->format('H:i') }}
                                             </small>
+                                            @if($event->location)
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-geo-alt me-1"></i>
+                                                    {{ $event->location }}
+                                                </small>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -412,22 +444,19 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Bekleyen Görevler</h5>
-                    <a href="{{ route('tasks.create') }}" class="btn btn-sm btn-primary">
+                    <button type="button" class="btn btn-sm btn-primary" id="addTaskButton">
                         <i class="bi bi-plus"></i> Yeni Ekle
-                    </a>
+                    </button>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if($pendingTasks->isEmpty())
                         <p class="text-muted text-center my-5">Bekleyen görev bulunmuyor.</p>
                     @else
-                        <div class="list-group list-group-flush">
+                        <div class="list-group list-group-flush widget-scroll">
                             @foreach($pendingTasks as $task)
-                                <div class="list-group-item border-0 ps-0">
+                                <div class="list-group-item border-0 px-3">
                                     <div class="d-flex align-items-center">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="task{{ $task->id }}">
-                                        </div>
-                                        <div class="ms-3">
+                                        <div class="flex-grow-1">
                                             <h6 class="mb-1">{{ $task->title }}</h6>
                                             @if($task->due_date)
                                                 <small class="text-muted">
@@ -435,6 +464,23 @@
                                                     Son Tarih: {{ Carbon\Carbon::parse($task->due_date)->format('d.m.Y') }}
                                                 </small>
                                             @endif
+                                            <div class="mt-1">
+                                                @php
+                                                    $priorityColors = [
+                                                        1 => 'success',
+                                                        2 => 'warning',
+                                                        3 => 'danger'
+                                                    ];
+                                                    $priorityLabels = [
+                                                        1 => 'Düşük',
+                                                        2 => 'Orta',
+                                                        3 => 'Yüksek'
+                                                    ];
+                                                @endphp
+                                                <span class="badge bg-{{ $priorityColors[$task->priority] }}-subtle text-{{ $priorityColors[$task->priority] }} rounded-pill">
+                                                    {{ $priorityLabels[$task->priority] }} Öncelik
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -518,6 +564,15 @@
                                 <option value="3">Yüksek</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Durum</label>
+                            <select class="form-select" id="taskStatus">
+                                <option value="pending">Bekliyor</option>
+                                <option value="in_progress">Devam Ediyor</option>
+                                <option value="completed">Tamamlandı</option>
+                                <option value="cancelled">İptal Edildi</option>
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -560,10 +615,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const eventAllDay = document.getElementById('eventAllDay');
     const taskDueDate = document.getElementById('taskDueDate');
     const taskPriority = document.getElementById('taskPriority');
+    const taskStatus = document.getElementById('taskStatus');
     
     // Butonlar
     const saveButton = document.getElementById('saveButton');
     const deleteButton = document.getElementById('deleteButton');
+    
+    // Widget butonları
+    const addEventButton = document.getElementById('addEventButton');
+    const addTaskButton = document.getElementById('addTaskButton');
     
     // Tarih formatlama fonksiyonu
     function formatDateTime(date) {
@@ -696,6 +756,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleFormType('task');
                 taskDueDate.value = formatDateTime(event.start);
                 taskPriority.value = event.extendedProps.priority;
+                taskStatus.value = event.extendedProps.status || 'pending';
             }
             
             deleteButton.style.display = 'block';
@@ -759,8 +820,94 @@ document.addEventListener('DOMContentLoaded', function() {
     
     calendar.render();
     
-    // Kaydet butonu
-    saveButton.addEventListener('click', function() {
+    // Form validasyon fonksiyonu
+    function validateForm() {
+        // Ortak alanların validasyonu
+        if (!itemTitle.value.trim()) {
+            showError('Başlık alanı zorunludur.');
+            return false;
+        }
+
+        const type = typeEvent.checked ? 'event' : 'task';
+
+        if (type === 'event') {
+            // Etkinlik validasyonları
+            if (!eventStart.value) {
+                showError('Başlangıç tarihi zorunludur.');
+                return false;
+            }
+
+            if (!eventEnd.value) {
+                showError('Bitiş tarihi zorunludur.');
+                return false;
+            }
+
+            const startDate = new Date(eventStart.value);
+            const endDate = new Date(eventEnd.value);
+
+            if (endDate < startDate) {
+                showError('Bitiş tarihi başlangıç tarihinden önce olamaz.');
+                return false;
+            }
+        } else {
+            // Görev validasyonları
+            if (!taskDueDate.value) {
+                showError('Son tarih zorunludur.');
+                return false;
+            }
+
+            const dueDate = new Date(taskDueDate.value);
+            const now = new Date();
+
+            if (dueDate < now && !itemId.value) {
+                showError('Son tarih geçmiş bir tarih olamaz.');
+                return false;
+            }
+
+            if (!taskPriority.value) {
+                showError('Öncelik seçimi zorunludur.');
+                return false;
+            }
+
+            if (!taskStatus.value) {
+                showError('Durum seçimi zorunludur.');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Hata gösterme fonksiyonu
+    function showError(message) {
+        // Mevcut hata mesajını temizle
+        const existingAlert = document.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Yeni hata mesajını oluştur
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show mb-3';
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        // Hata mesajını form başına ekle
+        const form = document.getElementById('calendarItemForm');
+        form.insertBefore(alert, form.firstChild);
+    }
+
+    // Modal form submit
+    saveButton.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Form validasyonu
+        if (!validateForm()) {
+            return;
+        }
+
         const type = typeEvent.checked ? 'event' : 'task';
         const id = itemId.value;
         const method = id ? 'PUT' : 'POST';
@@ -783,7 +930,8 @@ document.addEventListener('DOMContentLoaded', function() {
             data = {
                 ...data,
                 due_date: taskDueDate.value,
-                priority: taskPriority.value
+                priority: taskPriority.value,
+                status: taskStatus.value
             };
         }
         
@@ -796,14 +944,25 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
         .then(data => {
             calendar.refetchEvents();
             modal.hide();
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Bir hata oluştu.');
+            if (error.errors) {
+                // API'den gelen validasyon hatalarını göster
+                const firstError = Object.values(error.errors)[0];
+                showError(firstError);
+            } else {
+                showError('Bir hata oluştu. Lütfen tekrar deneyin.');
+            }
         });
     });
     
@@ -831,6 +990,48 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Yeni öğe ekleme fonksiyonu
+    function showAddModal(type) {
+        resetForm();
+        
+        if (type === 'event') {
+            typeEvent.checked = true;
+            toggleFormType('event');
+        } else {
+            typeTask.checked = true;
+            toggleFormType('task');
+            taskStatus.value = 'pending';
+        }
+        typeSelection.style.display = 'none';
+
+        // Varsayılan tarih değerlerini ayarla
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        if (type === 'event') {
+            // Etkinlik için varsayılan zaman aralığı (şimdi - 1 saat sonrası)
+            const endTime = new Date(now);
+            endTime.setHours(endTime.getHours() + 1);
+            
+            eventStart.value = formatDateTime(now);
+            eventEnd.value = formatDateTime(endTime);
+        } else {
+            // Görev için varsayılan son tarih (yarın)
+            taskDueDate.value = formatDateTime(tomorrow);
+        }
+
+        // Modal başlığını ayarla
+        document.getElementById('calendarItemModalTitle').textContent = 
+            type === 'event' ? 'Yeni Etkinlik Ekle' : 'Yeni Görev Ekle';
+
+        modal.show();
+    }
+
+    // Widget buton click olayları
+    addEventButton.addEventListener('click', () => showAddModal('event'));
+    addTaskButton.addEventListener('click', () => showAddModal('task'));
 });
 </script>
 @endsection 
