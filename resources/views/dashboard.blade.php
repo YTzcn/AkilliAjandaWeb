@@ -460,7 +460,8 @@
                     <input type="hidden" id="itemId">
                     <input type="hidden" id="itemType">
                     
-                    <div class="mb-3">
+                    <!-- Tür seçimi - sadece yeni eklemede görünür -->
+                    <div class="mb-3" id="typeSelection">
                         <label class="form-label">Tür</label>
                         <div class="btn-group w-100" role="group">
                             <input type="radio" class="btn-check" name="type" id="typeEvent" value="event" checked>
@@ -550,6 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form alanları
     const itemId = document.getElementById('itemId');
     const itemType = document.getElementById('itemType');
+    const typeSelection = document.getElementById('typeSelection');
     const itemTitle = document.getElementById('itemTitle');
     const itemDescription = document.getElementById('itemDescription');
     const eventStart = document.getElementById('eventStart');
@@ -590,6 +592,8 @@ document.addEventListener('DOMContentLoaded', function() {
         typeEvent.checked = true;
         toggleFormType('event');
         deleteButton.style.display = 'none';
+        typeSelection.style.display = 'block'; // Tür seçimini göster
+        document.getElementById('calendarItemModalTitle').textContent = 'Yeni Ekle';
     }
     
     // Takvimi oluştur
@@ -667,6 +671,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const event = info.event;
             const type = event.extendedProps.type;
+            
+            // Modal başlığını güncelle
+            document.getElementById('calendarItemModalTitle').textContent = 
+                type === 'event' ? 'Etkinliği Düzenle' : 'Görevi Düzenle';
+            
+            // Tür seçimini gizle
+            typeSelection.style.display = 'none';
             
             itemId.value = event.id;
             itemType.value = type;
