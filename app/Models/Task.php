@@ -20,7 +20,9 @@ class Task extends Model
         'title',
         'description',
         'due_date',
-        'is_completed',
+        'status',
+        'priority',
+        'is_completed'
     ];
 
     /**
@@ -29,8 +31,9 @@ class Task extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'due_date' => 'date',
+        'due_date' => 'datetime',
         'is_completed' => 'boolean',
+        'priority' => 'integer'
     ];
 
     /**

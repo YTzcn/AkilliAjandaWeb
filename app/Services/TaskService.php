@@ -121,4 +121,32 @@ class TaskService
     {
         return $this->taskRepository->markAsPending($taskId);
     }
+
+    public function getCalendarTasks(array $filters = []): array
+    {
+        $tasks = $this->taskRepository->getForCalendar($filters);
+        return $tasks->map(function ($task) {
+            return $this->formatForCalendar($task);
+        })->toArray();
+    }
+
+    public function handleCalendarCreate(array $data): Task
+    {
+        return $this->taskRepository->createFromCalendar($data);
+    }
+
+    public function handleCalendarUpdate(Task $task, array $data): Task
+    {
+        return $this->taskRepository->updateFromCalendar($task, $data);
+    }
+
+    public function handleCalendarDelete(Task $task): bool
+    {
+        return $this->taskRepository->deleteFromCalendar($task);
+    }
+
+    public function formatForCalendar(Task $task): array
+    {
+        return $this->taskRepository->formatForCalendar($task);
+    }
 } 

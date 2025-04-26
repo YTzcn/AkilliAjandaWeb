@@ -9,6 +9,7 @@ use App\Models\Note;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,49 +25,81 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        // Demo için etkinlikler oluştur
-        Event::create([
-            'user_id' => $user->id,
-            'title' => 'Proje Toplantısı',
-            'description' => 'Haftalık proje ilerleme toplantısı',
-            'start_time' => now()->addDays(2)->setHour(10)->setMinute(0),
-            'end_time' => now()->addDays(2)->setHour(11)->setMinute(30),
-            'location' => 'Toplantı Salonu A',
-        ]);
+        // Bugünün tarihini al
+        $today = Carbon::today();
 
-        Event::create([
-            'user_id' => $user->id,
-            'title' => 'Müşteri Görüşmesi',
-            'description' => 'XYZ firması ile yeni proje hakkında görüşme',
-            'start_time' => now()->addDays(3)->setHour(14)->setMinute(0),
-            'end_time' => now()->addDays(3)->setHour(15)->setMinute(0),
-            'location' => 'Zoom Toplantısı',
-        ]);
+        // Örnek etkinlikler oluştur
+        $events = [
+            [
+                'title' => 'Toplantı',
+                'description' => 'Haftalık ekip toplantısı',
+                'start_date' => $today->copy()->addDays(1)->setHour(10),
+                'end_date' => $today->copy()->addDays(1)->setHour(11),
+                'location' => 'Toplantı Odası',
+                'all_day' => false,
+            ],
+            [
+                'title' => 'Doğum Günü',
+                'description' => 'Ahmet\'in doğum günü kutlaması',
+                'start_date' => $today->copy()->addDays(3),
+                'end_date' => $today->copy()->addDays(3),
+                'location' => 'Kafe',
+                'all_day' => true,
+            ],
+            [
+                'title' => 'Proje Teslimi',
+                'description' => 'Proje final teslimi',
+                'start_date' => $today->copy()->addDays(5)->setHour(15),
+                'end_date' => $today->copy()->addDays(5)->setHour(16),
+                'location' => 'Ofis',
+                'all_day' => false,
+            ],
+        ];
 
-        // Demo için görevler oluştur
-        Task::create([
-            'user_id' => $user->id,
-            'title' => 'Rapor Hazırlama',
-            'description' => 'Aylık finansal raporu hazırla',
-            'due_date' => now()->addDays(5),
-            'is_completed' => false,
-        ]);
+        foreach ($events as $event) {
+            Event::create(array_merge($event, ['user_id' => $user->id]));
+        }
 
-        Task::create([
-            'user_id' => $user->id,
-            'title' => 'E-postaları Yanıtla',
-            'description' => 'Bekleyen tüm e-postaları yanıtla',
-            'due_date' => now()->addDay(),
-            'is_completed' => false,
-        ]);
+        // Örnek görevler oluştur
+        $tasks = [
+            [
+                'title' => 'Rapor Hazırla',
+                'description' => 'Aylık satış raporu hazırlanacak',
+                'due_date' => $today->copy()->addDays(2)->setHour(17),
+                'priority' => 3, // Yüksek
+                'status' => 'pending',
+                'is_completed' => false,
+            ],
+            [
+                'title' => 'E-postaları Yanıtla',
+                'description' => 'Bekleyen e-postalar yanıtlanacak',
+                'due_date' => $today->copy()->addDay()->setHour(12),
+                'priority' => 2, // Orta
+                'status' => 'pending',
+                'is_completed' => false,
+            ],
+            [
+                'title' => 'Dosyaları Düzenle',
+                'description' => 'Proje dosyaları düzenlenecek',
+                'due_date' => $today->copy()->addDays(4)->setHour(15),
+                'priority' => 1, // Düşük
+                'status' => 'pending',
+                'is_completed' => false,
+            ],
+            [
+                'title' => 'Tamamlanmış Görev',
+                'description' => 'Bu görev tamamlandı',
+                'due_date' => $today->copy()->subDay(),
+                'priority' => 2,
+                'status' => 'completed',
+                'is_completed' => true,
+            ],
+        ];
 
-        Task::create([
-            'user_id' => $user->id,
-            'title' => 'Sunum Hazırla',
-            'description' => 'Müşteri toplantısı için sunum hazırla',
-            'due_date' => now()->addDays(2),
-            'is_completed' => true,
-        ]);
+        foreach ($tasks as $task) {
+            Task::create(array_merge($task, ['user_id' => $user->id]));
+        }
+
         // Test kullanıcısı
         User::create([
             'name' => 'Test Kullanıcı',

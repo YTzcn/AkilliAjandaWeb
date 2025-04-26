@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\EventController as ApiEventController;
+use App\Http\Controllers\Api\TaskController as ApiTaskController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
@@ -32,6 +34,21 @@ Route::get('/events/date-range', [EventController::class, 'dateRange'])->name('e
 Route::resource('tasks', TaskController::class);
 Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
 Route::patch('/tasks/{task}/pending', [TaskController::class, 'pending'])->name('tasks.pending');
+
+// Calendar API Routes
+Route::middleware('auth')->prefix('api/calendar')->group(function () {
+    // Events
+    Route::get('/events', [ApiEventController::class, 'index']);
+    Route::post('/events', [ApiEventController::class, 'store']);
+    Route::put('/events/{event}', [ApiEventController::class, 'update']);
+    Route::delete('/events/{event}', [ApiEventController::class, 'destroy']);
+    
+    // Tasks
+    Route::get('/tasks', [ApiTaskController::class, 'index']);
+    Route::post('/tasks', [ApiTaskController::class, 'store']);
+    Route::put('/tasks/{task}', [ApiTaskController::class, 'update']);
+    Route::delete('/tasks/{task}', [ApiTaskController::class, 'destroy']);
+});
 
 // Profile
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

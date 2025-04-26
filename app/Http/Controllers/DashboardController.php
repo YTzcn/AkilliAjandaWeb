@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\EventService;
 use App\Services\TaskService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -40,10 +41,14 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        $today = Carbon::today()->format('Y-m-d');
-        $oneWeekLater = Carbon::today()->addWeek()->format('Y-m-d');
+        $today = Carbon::today();
+        $oneWeekLater = Carbon::today()->addWeek();
 
-        $upcomingEvents = $this->eventService->getEventsForDateRange($today, $oneWeekLater);
+        $upcomingEvents = $this->eventService->getEventsForDateRange(
+            $today->format('Y-m-d H:i:s'),
+            $oneWeekLater->format('Y-m-d H:i:s')
+        );
+        
         $pendingTasks = $this->taskService->getPendingTasks();
 
         return view('dashboard', compact('upcomingEvents', 'pendingTasks'));

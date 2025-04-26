@@ -43,7 +43,7 @@ class EventService
      */
     public function getEventsForDateRange(string $startDate, string $endDate): Collection
     {
-        return $this->eventRepository->getEventsBetweenDates(Auth::id(), $startDate, $endDate);
+        return $this->eventRepository->getEventsBetweenDates($startDate, $endDate);
     }
 
     /**
@@ -90,5 +90,33 @@ class EventService
     public function getEventById(int $eventId): ?Event
     {
         return $this->eventRepository->findById($eventId);
+    }
+
+    public function getCalendarEvents(array $filters = []): array
+    {
+        $events = $this->eventRepository->getForCalendar($filters);
+        return $events->map(function ($event) {
+            return $this->formatForCalendar($event);
+        })->toArray();
+    }
+
+    public function handleCalendarCreate(array $data): Event
+    {
+        return $this->eventRepository->createFromCalendar($data);
+    }
+
+    public function handleCalendarUpdate(Event $event, array $data): Event
+    {
+        return $this->eventRepository->updateFromCalendar($event, $data);
+    }
+
+    public function handleCalendarDelete(Event $event): bool
+    {
+        return $this->eventRepository->deleteFromCalendar($event);
+    }
+
+    public function formatForCalendar(Event $event): array
+    {
+        return $this->eventRepository->formatForCalendar($event);
     }
 } 

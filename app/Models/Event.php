@@ -19,9 +19,10 @@ class Event extends Model
         'user_id',
         'title',
         'description',
-        'start_time',
-        'end_time',
+        'start_date',
+        'end_date',
         'location',
+        'all_day'
     ];
 
     /**
@@ -30,8 +31,9 @@ class Event extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'all_day' => 'boolean'
     ];
 
     /**
