@@ -57,62 +57,76 @@ class OpenRouterProvider implements ProviderInterface
                 "messages" => [
                     [
                         "role" => "system",
-                        "content" => "Sen bir Akıllı Ajanda Uygulamasının Asistanısın. Kullanıcılar seninle konuşarak ajanda üzerindeki işlemlerini yapabilirler."
+                        "content" => 
+                            "Sen bir Akıllı Ajanda Uygulamasının Asistanısın. " .
+                            "Ana görevin kullanıcıların ajanda işlemlerini yönetmek. " .
+                            "Kısa, profesyonel sohbet yapabilirsin; ancak aşağıdaki kurallara kesinlikle uy:" . "\n" .
+                            "1. Ajanda dışı cevapları en fazla 2 cümleyle sınırlı tut." . "\n" .
+                            "2. Her zaman profesyonel ve saygılı ol." . "\n" .
+                            "3. Sohbet yalnızca selamlaşma, hal hatır sorma, teşekkür ve özür dileme konularını içerebilir." . "\n" .
+                            "4. Asla kişisel konulara, siyasete, dine, spora veya espriye girme." . "\n" .
+                            "5. Sohbet uzarsa nazikçe ajanda konusuna dön." . "\n" .
+                            "6. Belirsiz mesajda ajandayla ilgili ne yapmak istediğini sor."
                     ],
                     [
                         "role" => "user",
-                        "content" => "ÖNEMLİ: Şu anki gerçek tarih ve saat: " . $currentDate . " Bu tarihi referans alarak işlem yap.\n" .
-                            "Tarih ile ilgili tüm kararlarında bugün olarak yukarıdaki tarihi kabul et ve buna göre hesaplama yap.\n" .
-                            "Kullanıcı mesajı: " . $message . "\n" .
-                            "Lütfen aşağıdaki adımları izle:\n" .
-                            "1. Kullanıcının mesajının içeriğini analiz et\n" .
-                            "2. Kullanıcının ne yapmak istediğini belirle: takvim sorgulama, etkinlik ekleme, görev güncelleme, görev ekleme veya özet bilgi isteme\n" .
-                            "3. Kullanıcının mesajındaki tarihleri, kişileri, etkinlik/görev detaylarını belirle\n" .
-                            "4. İçerik türünü belirle: Kullanıcı etkinlikleri mi, görevleri mi yoksa her ikisini birden mi sorguluyor\n" .
-                            "5. Görevler için öncelik ve durum değerlerini kullanıcının ifade tarzından çıkar:\n" .
-                            "   - Öncelik: 1 (düşük), 2 (orta), 3 (yüksek/acil)\n" .
-                            "   - İfadede \"önemli\", \"acil\", \"hemen\", \"kritik\" gibi kelimeler varsa öncelik 3 (yüksek) olmalı\n" .
-                            "   - İfadede \"önemsiz\", \"acil değil\", \"vakit buldukça\" gibi ifadeler varsa öncelik 1 (düşük) olmalı\n" .
-                            "   - Belirgin bir vurgu yoksa öncelik 2 (orta) kullan\n" .
-                            "   - Durum: \"beklemede\" (pending), \"devam_ediyor\" (in_progress), \"tamamlandı\" (completed), \"iptal\" (cancelled)\n" .
-                            "   - İfadede \"başla\", \"başlayacağım\", \"üzerinde çalışıyorum\" gibi ifadeler varsa durum \"devam_ediyor\" olmalı\n" .
-                            "   - İfadede \"tamamlandı\", \"bitti\", \"hallettim\" gibi kelimeler varsa durum \"tamamlandı\" olmalı\n" .
-                            "   - İfadede \"iptal\", \"vazgeçtim\", \"yapılmayacak\" varsa durum \"iptal\" olmalı\n" .
-                            "   - Belirgin bir durum belirtilmemişse varsayılan olarak \"beklemede\" kullan\n" .
-                            "6. Yanıtını tam olarak aşağıdaki JSON formatında ver (başka bir metin veya açıklama olmadan):\n" .
+                        "content" =>
+                            "ÖNEMLİ: Şu anki tarih ve saat: " . $currentDate . 
+                            ". Bu tarihi referans alarak hareket et.\n\n" .
+                            "Kullanıcı mesajı: " . $message . "\n\n" .
+                            "Lütfen şu adımları izle:\n" .
+                            "1. Mesajı analiz et ve işlem tipini belirle: takvim_sorgulama, yeni_etkinlik, yeni_görev, gorev_guncelleme, etkinlik_guncelleme, ozet_bilgi.\n" .
+                            "2. Mesajdaki tarihleri, kişileri ve etkinlik/görev detaylarını yakala.\n" .
+                            "3. İçerik türünü tespit et: etkinlik, görev veya ikisi birden.\n" .
+                            "4. Görev öncelik ve durumunu ifadeden çıkar:\n" .
+                            "   • Öncelik: 1=düşük, 2=orta, 3=yüksek. \"önemli\", \"acil\" vb. → 3; \"önemsiz\", \"vakit buldukça\" vb. → 1; aksi halde 2.\n" .
+                            "   • Durum: pending, in_progress, completed, cancelled. \"başla\", \"çalışıyorum\" → in_progress; \"tamamlandı\", \"bitti\" → completed; \"iptal\", \"vazgeçtim\" → cancelled; aksi halde pending.\n" .
+                            "5. Yanıtını **yalnızca** şu JSON formatında ver (CODE BLOĞU veya ekstra metin yok):\n" .
                             "{\n" .
-                            "  \"type\": \"işlem_tipi\", // takvim_sorgulama, yeni_etkinlik, yeni_görev, gorev_guncelleme, ozet_bilgi\n" .
+                            "  \"type\": \"işlem_tipi\",\n" .
                             "  \"data\": {\n" .
-                            "    \"title\": \"Etkinlik/Görev başlığı\", // Etkinlik veya görev başlığı\n" .
-                            "    \"start_date\": \"YYYY-MM-DD HH:MM:SS\", // Başlangıç tarihi ve saati (etkinlikler için), her zaman tam tarih saat kullan\n" .
-                            "    \"end_date\": \"YYYY-MM-DD HH:MM:SS\", // Bitiş tarihi ve saati (etkinlikler için), her zaman tam tarih saat kullan\n" .
-                            "    \"due_date\": \"YYYY-MM-DD HH:MM:SS\", // Bitiş tarihi (görevler için), her zaman tam tarih saat kullan\n" .
-                            "    \"description\": \"Açıklama\", // Varsa açıklama\n" .
-                            "    \"location\": \"Konum\", // Varsa konum (etkinlikler için)\n" .
-                            "    \"task_id\": \"id\", // Görev güncellemesi için ID\n" .
-                            "    \"all_day\": false, // Tüm gün etkinliği mi? (etkinlikler için)\n" .
-                            "    \"status\": \"beklemede\", // Görevin durumu (görevler için): beklemede (pending), devam_ediyor (in_progress), tamamlandı (completed), iptal (cancelled)\n" .
-                            "    \"priority\": 2, // Görevin önceliği (görevler için): 1 (düşük), 2 (orta), 3 (yüksek/acil)\n" .
-                            "    \"is_completed\": false, // Görev tamamlandı mı? (görevler için) - status=completed ise true, değilse false\n" .
-                            "    \"content_type\": \"both\", // Sorgu türü: etkinlikler, görevler veya her ikisi\n" .
-                            "    \"user_id\": 1 // Etkinlik veya görev sahibi ID (normalde burası yok sayılacak, sistem otomatik atayacak)\n" .
+                            "    \"title\": \"Başlık\",\n" .
+                            "    \"start_date\": \"YYYY-MM-DD HH:MM:SS\",\n" .
+                            "    \"end_date\": \"YYYY-MM-DD HH:MM:SS\",\n" .
+                            "    \"due_date\": \"YYYY-MM-DD HH:MM:SS\",\n" .
+                            "    \"description\": \"Açıklama\",\n" .
+                            "    \"location\": \"Konum\",\n" .
+                            "    \"task_id\": \"ID\",\n" .
+                            "    \"event_id\": \"ID\", // Etkinlik güncellemesi için ID
+" .
+                            "    \"all_day\": false,\n" .
+                            "    \"status\": \"pending\",\n" .
+                            "    \"priority\": 2,\n" .
+                            "    \"is_completed\": false,\n" .
+                            "    \"content_type\": \"both\",\n" .
+                            "    \"user_id\": 1\n" .
                             "  }\n" .
-                            "}\n" .
-                            "ÖNEMLİ NOTLAR:\n" .
-                            "1. \"bugün\" ifadesini görürsen MUTLAKA " . $currentDate . " tarihini kullan, kendi kafandan tarih uydurma\n" .
-                            "2. \"yarın\" ifadesini görürsen MUTLAKA " . Carbon::tomorrow()->format('Y-m-d H:i:s') . " tarihini kullan\n" .
-                            "3. \"dün\" ifadesini görürsen MUTLAKA " . Carbon::yesterday()->format('Y-m-d H:i:s') . " tarihini kullan\n" .
-                            "4. Tarihleri yazarken her zaman tam tarih ve saat formatı (YYYY-MM-DD HH:MM:SS) kullan\n" .
-                            "5. Tarihler HER ZAMAN gerçek şu anki tarihten (YUKARIDA VERİLEN " . $currentDate . " TARİHİNDEN) hesaplanmalıdır\n" .
-                            "6. Kendi bildiğin tarih yerine MUTLAKA yukarıdaki güncel tarihi kullan\n" .
-                            "7. Görev önceliği (priority) ve durumu (status) kullanıcının ifade tonundan MUTLAKA çıkarılmalıdır\n" .
-                            "8. Yanıtını sadece JSON formatında ver. Başka açıklama ekleme, yorum yapma veya metinle cevap verme. JSON yanıtı kod bloğu (```) içinde de verme. JSON dışında hiçbir karakter olmamalıdır."
+                            "}\n\n" .
+                            "Tarihlerde \"bugün\", \"yarın\", \"dün\" ifadelerini sırasıyla:\n" .
+                            "- bugün → " . $currentDate . "\n" .
+                            "- yarın → " . Carbon::tomorrow()->format('Y-m-d H:i:s') . "\n" .
+                            "- dün → " . Carbon::yesterday()->format('Y-m-d H:i:s') . "\n" .
+                            "olarak kullan. Hep tam format (YYYY-MM-DD HH:MM:SS) ve verilen " . $currentDate . " referans alınsın.\n\n" .
+                            "ÇOK ÖNEMLİ NOTLAR:\n" .
+                            "1. Takvim sorgulama işleminde MUTLAKA user_id değerini 1 olarak belirle, NULL BIRAKMA!\n" .
+                            "2. Takvim sorgulama işleminde start_date ve end_date değerlerinin her ikisini de doldur, NULL BIRAKMA!\n" .
+                            "3. content_type değerini MUTLAKA doldur - etkinlikler, görevler veya her ikisi (both). NULL BIRAKMA!\n" .
+                            "4. Eğer bir alan için değer belirtilmemişse, o alanı NULL BIRAKMA. Uygun bir varsayılan değer kullan.\n" .
+                            "5. Bugünkü tarihi soruyorsa start_date=" . $currentDate . " ve end_date=" . Carbon::today()->endOfDay()->format('Y-m-d H:i:s') . " olarak ayarla.\n" .
+                            "6. Yarınki tarihi soruyorsa start_date=" . Carbon::tomorrow()->startOfDay()->format('Y-m-d H:i:s') . " ve end_date=" . Carbon::tomorrow()->endOfDay()->format('Y-m-d H:i:s') . " olarak ayarla.\n" .
+                            "7. ÇOK ÖNEMLİ: Görev veya etkinlik güncelleme işleminde (type: gorev_guncelleme veya etkinlik_guncelleme) şunlara dikkat et:\n" .
+                            "    a. Eğer kullanıcı mesajda ID belirtiyorsa (örn: \"#5 numaralı görevi güncelle\", \"etkinlik 12\'nin yerini değiştir\"), task_id veya event_id alanını doldur.\n" .
+                            "    b. Eğer kullanıcı ID yerine başlık belirtiyorsa (örn: \"YGA sunumunu güncelle\", \"Doktor randevusunu taşı\"), task_id ve event_id alanlarını BOŞ BIRAK (null yap), bunun yerine title alanına kullanıcının belirttiği başlığı yaz.\n" .
+                            "    c. Güncellenmesi istenen diğer alanları (location, start_date, status vb.) normal şekilde doldur.\n" .
+                            "8. Eğer kullanıcı görev/etkinlik güncellemesi yapmak istiyor ama ID belirtmemişse, işlem tipini yine gorev_guncelleme/etkinlik_guncelleme olarak belirle, sistem ID'yi bulmaya çalışacak.\n" .
+                            "9. Yanıt oluştururken varsa etkinlik ve görevlerin ID bilgilerini MUTLAKA göster, kullanıcının bu bilgileri görmesi önemlidir."
                     ]
                 ],
                 "response_format" => [
                     "type" => "json_object"
                 ]
             ]);
+            
             
             if (!isset($response['choices'][0]['message']['content'])) {
                 throw new Exception("API geçerli bir yanıt döndürmedi");
@@ -128,6 +142,28 @@ class OpenRouterProvider implements ProviderInterface
             // Data kontrolü - bazı durumlarda data alanı boş gelebilir
             if (!isset($analysis['data']) || !is_array($analysis['data'])) {
                 $analysis['data'] = [];
+            }
+            
+            // Kritik alanların varsayılan değerlerini ata
+            if ($analysis['type'] === 'takvim_sorgulama') {
+                if (!isset($analysis['data']['user_id']) || $analysis['data']['user_id'] === null) {
+                    $analysis['data']['user_id'] = auth()->id() ?? 1;
+                }
+                
+                if (!isset($analysis['data']['content_type']) || $analysis['data']['content_type'] === null) {
+                    $analysis['data']['content_type'] = 'both';
+                }
+                
+                // start_date null ise bugün olarak ayarla
+                if (!isset($analysis['data']['start_date']) || $analysis['data']['start_date'] === null) {
+                    $analysis['data']['start_date'] = Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
+                }
+                
+                // end_date null ise ve start_date varsa start_date ile aynı günün sonu olarak ayarla
+                if ((!isset($analysis['data']['end_date']) || $analysis['data']['end_date'] === null) && isset($analysis['data']['start_date'])) {
+                    $startDate = Carbon::parse($analysis['data']['start_date']);
+                    $analysis['data']['end_date'] = $startDate->copy()->endOfDay()->format('Y-m-d H:i:s');
+                }
             }
             
             return $analysis;

@@ -336,6 +336,120 @@
     .widget-scroll::-webkit-scrollbar-thumb:hover {
         background: #a8a8a8;
     }
+
+    /* Chat Offcanvas Stilleri */
+    .chat-offcanvas {
+        width: 400px !important;
+    }
+
+    .chat-messages {
+        height: calc(100vh - 250px);
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .chat-input {
+        padding: 1rem;
+        background: #fff;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .message {
+        margin-bottom: 1rem;
+        max-width: 80%;
+    }
+
+    .message-user {
+        margin-left: auto;
+        background: #007bff;
+        color: white;
+        border-radius: 15px 15px 0 15px;
+        padding: 0.75rem;
+    }
+
+    .message-ai {
+        background: #f8f9fa;
+        border-radius: 15px 15px 15px 0;
+        padding: 0.75rem;
+    }
+
+    .message-ai .message-content {
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .message-ai .date-header {
+        font-weight: 600;
+        font-size: 1.1em;
+        color: #2c3e50;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.25rem;
+        border-bottom: 2px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .message-ai .list-item {
+        padding-left: 1rem;
+        position: relative;
+        margin: 0.5rem 0;
+    }
+
+    .message-ai .list-item::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #4158d0;
+    }
+
+    .message-ai .message-content > :first-child {
+        margin-top: 0;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    .message-type {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    .message-type.success {
+        color: #28a745;
+    }
+
+    .message-type.error {
+        color: #dc3545;
+    }
+
+    /* Yükleniyor Animasyonu */
+    .typing-indicator {
+        display: none;
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .typing-indicator span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #007bff;
+        border-radius: 50%;
+        margin-right: 5px;
+        animation: typing 1s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
 </style>
 @endsection
 
@@ -344,7 +458,12 @@
     <!-- Başlık ve Tarih -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">Hoş Geldiniz, {{ Auth::user()->name }}</h1>
-        <div class="text-muted">{{ Carbon\Carbon::now()->locale('tr')->isoFormat('LL') }}</div>
+        <div class="d-flex align-items-center">
+            <div class="text-muted me-3">{{ Carbon\Carbon::now()->locale('tr')->isoFormat('LL') }}</div>
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#chatOffcanvas">
+                <i class="bi bi-chat-dots"></i> Sohbet
+            </button>
+        </div>
     </div>
 
     <div class="dashboard-container">
@@ -581,6 +700,32 @@
                 <button type="button" class="btn btn-danger" id="deleteButton" style="display: none;">Sil</button>
                 <button type="button" class="btn btn-primary" id="saveButton">Kaydet</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chat Offcanvas -->
+<div class="offcanvas offcanvas-end chat-offcanvas" tabindex="-1" id="chatOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Akıllı Asistan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column p-0">
+        <div class="chat-messages" id="chatMessages">
+            <!-- Mesajlar buraya gelecek -->
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="chat-input mt-auto">
+            <form id="chatForm" class="d-flex gap-2">
+                <input type="text" class="form-control" id="messageInput" placeholder="Mesajınızı yazın...">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send"></i>
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -1032,6 +1177,167 @@ document.addEventListener('DOMContentLoaded', function() {
     // Widget buton click olayları
     addEventButton.addEventListener('click', () => showAddModal('event'));
     addTaskButton.addEventListener('click', () => showAddModal('task'));
+});
+
+// Chat İşlevleri
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.getElementById('chatForm');
+    const messageInput = document.getElementById('messageInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const typingIndicator = document.querySelector('.typing-indicator');
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Sayfa yüklendiğinde son mesajları getir
+    loadLatestMessages();
+
+    // Form gönderimi
+    chatForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Kullanıcı mesajını ekle
+        appendMessage({
+            message: message,
+            is_user: true,
+            created_at: new Date().toISOString()
+        });
+
+        messageInput.value = '';
+        messageInput.disabled = true;
+        typingIndicator.style.display = 'block';
+        scrollToBottom();
+
+        try {
+            const response = await fetch('/api/chat/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                appendMessage({
+                    message: data.response,
+                    is_user: false,
+                    created_at: new Date().toISOString(),
+                    message_type: data.type,
+                    is_successful: data.is_successful
+                });
+            } else {
+                throw new Error(data.message || 'Bir hata oluştu');
+            }
+        } catch (error) {
+            appendMessage({
+                message: 'Üzgünüm, bir hata oluştu: ' + error.message,
+                is_user: false,
+                created_at: new Date().toISOString(),
+                is_successful: false
+            });
+        } finally {
+            messageInput.disabled = false;
+            typingIndicator.style.display = 'none';
+            scrollToBottom();
+        }
+    });
+
+    // Son mesajları yükle
+    async function loadLatestMessages() {
+        try {
+            const response = await fetch('/api/messages?limit=10', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                chatMessages.innerHTML = ''; // Mevcut mesajları temizle
+                
+                data.data.reverse().forEach(message => {
+                    appendMessage({
+                        message: message.user_message,
+                        is_user: true,
+                        created_at: message.created_at
+                    });
+                    
+                    appendMessage({
+                        message: message.ai_response,
+                        is_user: false,
+                        created_at: message.created_at,
+                        message_type: message.message_type,
+                        is_successful: message.is_successful
+                    });
+                });
+
+                scrollToBottom();
+            }
+        } catch (error) {
+            console.error('Mesajlar yüklenirken hata:', error);
+        }
+    }
+
+    // Mesaj ekle
+    function appendMessage(messageData) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${messageData.is_user ? 'message-user' : 'message-ai'}`;
+        
+        let messageContent = messageData.message;
+        
+        // AI mesajı ise formatlamayı uygula
+        if (!messageData.is_user) {
+            // Özel karakterleri temizle
+            messageContent = messageContent.replace(/\*\*/g, '');
+            
+            // Satır satır işle
+            messageContent = messageContent.split('\n').map(line => {
+                // Tarih satırlarını formatla (yıl ile biten satırlar)
+                if (line.match(/\d{4}['te]*:$/)) {
+                    return `<div class="date-header">${line}</div>`;
+                }
+                // Madde işaretlerini formatla ve * karakterini kaldır
+                if (line.startsWith('* ')) {
+                    return `<div class="list-item">${line.substring(2)}</div>`;
+                }
+                return line;
+            }).join('\n');
+        }
+        
+        // Mesaj içeriği
+        messageDiv.innerHTML = `
+            <div class="message-content">${messageContent}</div>
+            <div class="message-time">${formatDate(messageData.created_at)}</div>
+            ${!messageData.is_user && messageData.message_type ? `
+                <div class="message-type ${messageData.is_successful ? 'success' : 'error'}">
+                    ${messageData.message_type}
+                </div>
+            ` : ''}
+        `;
+
+        chatMessages.appendChild(messageDiv);
+    }
+
+    // Tarihi formatla
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('tr-TR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // En alta kaydır
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 });
 </script>
 @endsection 

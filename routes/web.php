@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\EventController as ApiEventController;
 use App\Http\Controllers\Api\TaskController as ApiTaskController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -56,5 +57,18 @@ Route::middleware(['ensure.auth'])->prefix('api/calendar')->group(function () {
     Route::put('/tasks/{task}', [ApiTaskController::class, 'update']);
     Route::delete('/tasks/{task}', [ApiTaskController::class, 'destroy']);
 });
+
+// Message routes
+Route::prefix('messages')->middleware(['ensure.auth'])->group(function () {
+    Route::get('/', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/date-range', [MessageController::class, 'dateRange'])->name('messages.date-range');
+    Route::get('/type/{type}', [MessageController::class, 'byType'])->name('messages.by-type');
+    Route::get('/failed', [MessageController::class, 'failed'])->name('messages.failed');
+    Route::get('/today', [MessageController::class, 'today'])->name('messages.today');
+    Route::get('/statistics', [MessageController::class, 'statistics'])->name('messages.statistics');
+});
+
+// Chat routes
+Route::post('/api/chat/send', [App\Http\Controllers\API\ChatController::class, 'send'])->middleware('ensure.auth');
 
 require __DIR__.'/auth.php';

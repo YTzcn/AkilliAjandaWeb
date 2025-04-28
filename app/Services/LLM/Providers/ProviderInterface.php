@@ -48,4 +48,4 @@ interface ProviderInterface
      * @return array
      */
     public function listModels(): array;
-} 
+}

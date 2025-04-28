@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LLMController;
 use Gemini\Laravel\Facades\Gemini;
+use App\Http\Controllers\Api\MessageController;
 
 // Kullanıcı bilgisi
 Route::middleware('ensure.auth')->get('/user', function (Request $request) {
@@ -61,4 +62,18 @@ Route::post('/test-model', function(Request $request){
             'error_trace' => app()->environment('production') ? null : $e->getTraceAsString()
         ], 500);
     }
+});
+
+// Message routes
+Route::prefix('messages')->group(function () {
+    Route::get('/', [MessageController::class, 'index']);
+    Route::get('/date-range', [MessageController::class, 'getByDateRange']);
+    Route::get('/type/{type}', [MessageController::class, 'getByType']);
+    Route::get('/failed', [MessageController::class, 'getFailedMessages']);
+    Route::get('/today', [MessageController::class, 'getTodaysMessages']);
+    Route::get('/statistics', [MessageController::class, 'getStatistics']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/chat/send', [App\Http\Controllers\API\ChatController::class, 'send']);
 });

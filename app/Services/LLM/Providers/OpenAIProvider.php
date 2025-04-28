@@ -66,7 +66,7 @@ class OpenAIProvider implements ProviderInterface
                             "Kullanıcı mesajı: " . $message . "\n" .
                             "Lütfen aşağıdaki adımları izle:\n" .
                             "1. Kullanıcının mesajının içeriğini analiz et\n" .
-                            "2. Kullanıcının ne yapmak istediğini belirle: takvim sorgulama, etkinlik ekleme, görev güncelleme, görev ekleme veya özet bilgi isteme\n" .
+                            "2. Kullanıcının ne yapmak istediğini belirle: takvim sorgulama, etkinlik ekleme, görev güncelleme, etkinlik güncelleme, görev ekleme veya özet bilgi isteme\n" .
                             "3. Kullanıcının mesajındaki tarihleri, kişileri, etkinlik/görev detaylarını belirle\n" .
                             "4. İçerik türünü belirle: Kullanıcı etkinlikleri mi, görevleri mi yoksa her ikisini birden mi sorguluyor\n" .
                             "5. Görevler için öncelik ve durum değerlerini kullanıcının ifade tarzından çıkar:\n" .
@@ -81,7 +81,7 @@ class OpenAIProvider implements ProviderInterface
                             "   - Belirgin bir durum belirtilmemişse varsayılan olarak \"beklemede\" kullan\n" .
                             "6. Yanıtını tam olarak aşağıdaki JSON formatında ver (başka bir metin veya açıklama olmadan):\n" .
                             "{\n" .
-                            "  \"type\": \"işlem_tipi\", // takvim_sorgulama, yeni_etkinlik, yeni_görev, gorev_guncelleme, ozet_bilgi\n" .
+                            "  \"type\": \"işlem_tipi\", // takvim_sorgulama, yeni_etkinlik, yeni_görev, gorev_guncelleme, etkinlik_guncelleme, ozet_bilgi\n" .
                             "  \"data\": {\n" .
                             "    \"title\": \"Etkinlik/Görev başlığı\", // Etkinlik veya görev başlığı\n" .
                             "    \"start_date\": \"YYYY-MM-DD HH:MM:SS\", // Başlangıç tarihi ve saati (etkinlikler için), her zaman tam tarih saat kullan\n" .
@@ -90,6 +90,7 @@ class OpenAIProvider implements ProviderInterface
                             "    \"description\": \"Açıklama\", // Varsa açıklama\n" .
                             "    \"location\": \"Konum\", // Varsa konum (etkinlikler için)\n" .
                             "    \"task_id\": \"id\", // Görev güncellemesi için ID\n" .
+                            "    \"event_id\": \"id\", // Etkinlik güncellemesi için ID\n" .
                             "    \"all_day\": false, // Tüm gün etkinliği mi? (etkinlikler için)\n" .
                             "    \"status\": \"beklemede\", // Görevin durumu (görevler için): beklemede (pending), devam_ediyor (in_progress), tamamlandı (completed), iptal (cancelled)\n" .
                             "    \"priority\": 2, // Görevin önceliği (görevler için): 1 (düşük), 2 (orta), 3 (yüksek/acil)\n" .
@@ -106,7 +107,17 @@ class OpenAIProvider implements ProviderInterface
                             "5. Tarihler HER ZAMAN gerçek şu anki tarihten (YUKARIDA VERİLEN " . $currentDate . " TARİHİNDEN) hesaplanmalıdır\n" .
                             "6. Kendi bildiğin tarih yerine MUTLAKA yukarıdaki güncel tarihi kullan\n" .
                             "7. Görev önceliği (priority) ve durumu (status) kullanıcının ifade tonundan MUTLAKA çıkarılmalıdır\n" .
-                            "8. Yanıtını sadece JSON formatında ver. Başka açıklama ekleme, yorum yapma veya metinle cevap verme. JSON yanıtı kod bloğu (```) içinde de verme. JSON dışında hiçbir karakter olmamalıdır."
+                            "8. Yanıtını sadece JSON formatında ver. Başka açıklama ekleme, yorum yapma veya metinle cevap verme. JSON yanıtı kod bloğu (```) içinde de verme. JSON dışında hiçbir karakter olmamalıdır.\n" .
+                            "9. ÇOK ÖNEMLİ: Takvim sorgulama işleminde MUTLAKA user_id değerini 1 olarak belirle, NULL BIRAKMA!\n" .
+                            "10. ÇOK ÖNEMLİ: Takvim sorgulama işleminde start_date ve end_date değerlerinin her ikisini de doldur, NULL BIRAKMA!\n" .
+                            "11. ÇOK ÖNEMLİ: content_type değerini MUTLAKA doldur - etkinlikler, görevler veya her ikisi (both). NULL BIRAKMA!\n" .
+                            "12. Eğer bir alan için değer belirtilmemişse, o alanı NULL BIRAKMA. Uygun bir varsayılan değer kullan.\n" .
+                            "13. ÇOK ÖNEMLİ: Görev veya etkinlik güncelleme işleminde (type: gorev_guncelleme veya etkinlik_guncelleme) şunlara dikkat et:\n" .
+                            "    a. Eğer kullanıcı mesajda ID belirtiyorsa (örn: \"#5 numaralı görevi güncelle\", \"etkinlik 12\'nin yerini değiştir\"), task_id veya event_id alanını doldur.\n" .
+                            "    b. Eğer kullanıcı ID yerine başlık belirtiyorsa (örn: \"YGA sunumunu güncelle\", \"Doktor randevusunu taşı\"), task_id ve event_id alanlarını BOŞ BIRAK (null yap), bunun yerine title alanına kullanıcının belirttiği başlığı yaz.\n" .
+                            "    c. Güncellenmesi istenen diğer alanları (location, start_date, status vb.) normal şekilde doldur.\n" .
+                            "14. Eğer kullanıcı görev/etkinlik güncellemesi yapmak istiyor ama ID belirtmemişse, işlem tipini yine gorev_guncelleme/etkinlik_guncelleme olarak belirle, sistem ID'yi bulmaya çalışacak.\n" .
+                            "15. Yanıt oluştururken varsa etkinlik ve görevlerin ID bilgilerini MUTLAKA göster, kullanıcının bu bilgileri görmesi önemlidir."
                     ]
                 ],
                 "response_format" => [
@@ -128,6 +139,17 @@ class OpenAIProvider implements ProviderInterface
             // Data kontrolü - bazı durumlarda data alanı boş gelebilir
             if (!isset($analysis['data']) || !is_array($analysis['data'])) {
                 $analysis['data'] = [];
+            }
+            
+            // Kritik alanların varsayılan değerlerini ata
+            if ($analysis['type'] === 'takvim_sorgulama') {
+                if (!isset($analysis['data']['user_id']) || $analysis['data']['user_id'] === null) {
+                    $analysis['data']['user_id'] = auth()->id() ?? 1;
+                }
+                
+                if (!isset($analysis['data']['content_type']) || $analysis['data']['content_type'] === null) {
+                    $analysis['data']['content_type'] = 'both';
+                }
             }
             
             return $analysis;

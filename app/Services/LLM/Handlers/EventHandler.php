@@ -157,4 +157,74 @@ class EventHandler
             return 'Özet bilgi oluşturulurken bir hata oluştu: ' . $e->getMessage();
         }
     }
+
+    /**
+     * Etkinlik güncelleme işlemlerini yönetir
+     *
+     * @param array $data İşlem verileri
+     * @return string Yanıt
+     */
+    public function handleEventUpdate(array $data): string
+    {
+        try {
+            $eventIdKey = 'event_id';
+            $eventId = $data[$eventIdKey] ?? null;
+
+            if (empty($eventId)) {
+                return 'Etkinlik güncellemek için etkinlik ID bilgisi eksik.';
+            }
+
+            $event = Event::find($eventId);
+
+            if (!$event) {
+                return "ID'si {$eventId} olan bir etkinlik bulunamadı.";
+            }
+            
+            // Yetki kontrolü - Sadece kendi etkinliğini güncelleyebilsin
+            if ($event->user_id !== (auth()->id() ?? 1)) {
+                return "Bu etkinliği güncelleme yetkiniz yok.";
+            }
+
+            // Güncellenecek verileri hazırla
+            $updateData = [];
+            $updateFields = ['title', 'description', 'start_date', 'end_date', 'location', 'all_day'];
+            $turkishKeys = ['başlık', 'açıklama', 'başlangıç_tarihi', 'bitiş_tarihi', 'konum', 'tüm_gün'];
+
+            foreach ($updateFields as $index => $field) {
+                $turkishField = $turkishKeys[$index];
+                if (isset($data[$field]) || isset($data[$turkishField])) {
+                    $value = $data[$field] ?? $data[$turkishField];
+                    
+                    // Tarih alanlarını parse et
+                    if (in_array($field, ['start_date', 'end_date'])) {
+                        try {
+                            $value = Carbon::parse($value);
+                        } catch (\Exception $e) {
+                            // Tarih parse edilemezse hata ver
+                            return "Geçersiz tarih formatı: {$field}";
+                        }
+                    }
+                    
+                    // all_day alanını boolean yap
+                    if ($field === 'all_day') {
+                        $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                    }
+                    
+                    $updateData[$field] = $value;
+                }
+            }
+            
+            // Eğer güncellenecek veri yoksa bilgi ver
+            if (empty($updateData)) {
+                return "Etkinlik için güncellenecek herhangi bir bilgi belirtilmedi.";
+            }
+
+            // Etkinliği güncelle
+            $event->update($updateData);
+
+            return "Etkinlik #{$event->id} başarıyla güncellendi: {$event->title}";
+        } catch (Exception $e) {
+            return 'Etkinlik güncellenirken bir hata oluştu: ' . $e->getMessage();
+        }
+    }
 } 
