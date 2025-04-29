@@ -84,18 +84,7 @@
                                 Gösterge Paneli
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('events.index') }}" class="nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}">
-                                <i class="bi bi-calendar-event me-2"></i>
-                                Etkinlikler
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('tasks.index') }}" class="nav-link {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
-                                <i class="bi bi-check2-square me-2"></i>
-                                Görevler
-                            </a>
-                        </li>
+                        
                     </ul>
                     <hr>
                     <div class="dropdown">

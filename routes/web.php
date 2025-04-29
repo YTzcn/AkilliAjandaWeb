@@ -71,4 +71,18 @@ Route::prefix('messages')->middleware(['ensure.auth'])->group(function () {
 // Chat routes
 Route::post('/api/chat/send', [App\Http\Controllers\API\ChatController::class, 'send'])->middleware('ensure.auth');
 
+// Google Takvim Entegrasyonu için route'lar
+Route::middleware(['ensure.auth'])->group(function () {
+    // Auth Routes
+    Route::get('/auth/google', [App\Http\Controllers\GoogleAuthController::class, 'redirectToGoogle'])->name('google.auth');
+    Route::get('/auth/google/callback', [App\Http\Controllers\GoogleAuthController::class, 'handleGoogleCallback'])->name('google.callback');
+    Route::post('/auth/google/disconnect', [App\Http\Controllers\GoogleAuthController::class, 'disconnectGoogle'])->name('google.disconnect');
+    
+    // Sync Routes
+    Route::get('/calendar/sync', [App\Http\Controllers\CalendarSyncController::class, 'syncPage'])->name('calendar.sync');
+    Route::post('/calendar/sync/google', [App\Http\Controllers\CalendarSyncController::class, 'syncWithGoogle'])->name('calendar.sync.google');
+    Route::post('/calendar/import/google', [App\Http\Controllers\CalendarSyncController::class, 'importFromGoogle'])->name('calendar.import.google');
+    Route::get('/calendar/settings', [App\Http\Controllers\CalendarSyncController::class, 'settings'])->name('calendar.settings');
+});
+
 require __DIR__.'/auth.php';
