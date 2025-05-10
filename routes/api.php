@@ -77,3 +77,13 @@ Route::prefix('messages')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/chat/send', [App\Http\Controllers\API\ChatController::class, 'send']);
 });
+
+// Notification Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notifications', [App\Http\Controllers\Api\NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [App\Http\Controllers\Api\NotificationController::class, 'getUnreadCount']);
+    Route::get('/notifications/{notification}', [App\Http\Controllers\Api\NotificationController::class, 'show']);
+    Route::post('/notifications/{notification}/mark-as-read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\Api\NotificationController::class, 'destroy']);
+});

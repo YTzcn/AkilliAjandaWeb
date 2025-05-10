@@ -14,7 +14,7 @@ class OpenRouterProvider implements ProviderInterface
      * 
      * @var string
      */
-    protected string $model = 'google/gemini-2.0-flash-exp:free';
+    protected string $model = 'deepseek/deepseek-r1:free';
     
     /**
      * OpenRouter API anahtarı
@@ -133,10 +133,11 @@ class OpenRouterProvider implements ProviderInterface
             }
 
             $content = $response['choices'][0]['message']['content'];
-            $analysis = json_decode($content, true);
+            $cleanedContent = $this->cleanJsonResponse($content);
+            $analysis = json_decode($cleanedContent, true);
             
             if (!is_array($analysis) || !isset($analysis['type'])) {
-                throw new Exception("AI yanıtı düzgün parse edilemedi: " . $content);
+                throw new Exception("AI yanıtı düzgün parse edilemedi: " . $cleanedContent);
             }
             
             // Data kontrolü - bazı durumlarda data alanı boş gelebilir
@@ -168,8 +169,25 @@ class OpenRouterProvider implements ProviderInterface
             
             return $analysis;
         } catch (Exception $e) {
+            // Log::error('[OpenRouterProvider] processMessage error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             throw new Exception('OpenRouter mesaj işleme hatası: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * JSON yanıtını markdown kod bloklarından temizler.
+     *
+     * @param string $response Ham yanıt.
+     * @return string Temizlenmiş JSON string.
+     */
+    private function cleanJsonResponse(string $response): string
+    {
+        // JSON yanıtını temizle - markdown kod bloklarını kaldır (```json ... ``` veya ``` ... ```)
+        // Baştaki ```json veya ``` kalıbını ve boşlukları temizle
+        $response = preg_replace('/^```(?:json)?\s*/i', '', $response);
+        // Sondaki ``` kalıbını ve boşlukları temizle
+        $response = preg_replace('/\s*```$/', '', $response);
+        return trim($response);
     }
     
     /**

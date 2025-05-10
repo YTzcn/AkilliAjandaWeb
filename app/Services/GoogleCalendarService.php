@@ -199,36 +199,37 @@ class GoogleCalendarService
                 // ID'ye göre mevcut olayı kontrol et
                 $existingEvent = Event::where('google_event_id', $googleEvent->getId())->first();
 
+                // Başlangıç ve bitiş zamanlarını ayarla
+                $startDateTime = Carbon::parse($googleEvent->start->dateTime ?? $googleEvent->start->date);
+                $endDateTime = Carbon::parse($googleEvent->end->dateTime ?? $googleEvent->end->date);
+
+                // Tüm gün etkinliği kontrolü
+                $isAllDay = !isset($googleEvent->start->dateTime);
+
+                $eventData = [
+                    'user_id' => $user->id,
+                    'title' => $googleEvent->getSummary(),
+                    'description' => $googleEvent->getDescription(),
+                    'start_date' => $startDateTime,
+                    'end_date' => $endDateTime,
+                    'location' => $googleEvent->getLocation(),
+                    'google_event_id' => $googleEvent->getId(),
+                    'synced_to_google' => true,
+                    'all_day' => $isAllDay
+                ];
+
                 if ($existingEvent) {
-                    // Güncelleme
-                    $existingEvent->update([
-                        'title' => $googleEvent->getSummary(),
-                        'description' => $googleEvent->getDescription(),
-                        'start_date' => Carbon::parse($googleEvent->getStart()->dateTime),
-                        'end_date' => Carbon::parse($googleEvent->getEnd()->dateTime),
-                        'location' => $googleEvent->getLocation(),
-                        'synced_to_google' => true,
-                    ]);
+                    $existingEvent->update($eventData);
                     $importedEvents[] = $existingEvent;
                 } else {
-                    // Yeni oluştur
-                    $newEvent = Event::create([
-                        'user_id' => $user->id,
-                        'title' => $googleEvent->getSummary(),
-                        'description' => $googleEvent->getDescription(),
-                        'start_date' => Carbon::parse($googleEvent->getStart()->dateTime),
-                        'end_date' => Carbon::parse($googleEvent->getEnd()->dateTime),
-                        'location' => $googleEvent->getLocation(),
-                        'google_event_id' => $googleEvent->getId(),
-                        'synced_to_google' => true,
-                    ]);
+                    $newEvent = Event::create($eventData);
                     $importedEvents[] = $newEvent;
                 }
             }
 
             return $importedEvents;
         } catch (\Exception $e) {
-            Log::error('Google Calendar Import Hatası: ' . $e->getMessage());
+            Log::error('Google Calendar Event İçe Aktarma Hatası: ' . $e->getMessage());
             return [];
         }
     }

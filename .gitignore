@@ -23,3 +23,8 @@ yarn-error.log
 /.zed
 package-lock.json
 composer.lock
+mermaid_diyagram.md
+nesne_diyagrami.txt
+component_diagram.md
+react-native-mobil-design-prd.md
+proje_uml_analiz.md
