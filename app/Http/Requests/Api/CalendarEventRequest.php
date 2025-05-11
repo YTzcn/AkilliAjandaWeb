@@ -4,6 +4,56 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @OA\Schema(
+ *     schema="CalendarEventRequest",
+ *     title="Takvim Etkinliği İsteği",
+ *     description="Takvim etkinliği oluşturma ve güncelleme için kullanılan form request",
+ *     required={"title", "start_date", "end_date"},
+ *     @OA\Property(
+ *         property="title",
+ *         type="string",
+ *         maxLength=255,
+ *         description="Etkinlik başlığı",
+ *         example="Toplantı"
+ *     ),
+ *     @OA\Property(
+ *         property="description",
+ *         type="string",
+ *         nullable=true,
+ *         description="Etkinlik açıklaması",
+ *         example="Haftalık ekip toplantısı"
+ *     ),
+ *     @OA\Property(
+ *         property="start_date",
+ *         type="string",
+ *         format="date-time",
+ *         description="Başlangıç tarihi ve saati",
+ *         example="2024-03-20T10:00:00"
+ *     ),
+ *     @OA\Property(
+ *         property="end_date",
+ *         type="string",
+ *         format="date-time",
+ *         description="Bitiş tarihi ve saati",
+ *         example="2024-03-20T11:00:00"
+ *     ),
+ *     @OA\Property(
+ *         property="all_day",
+ *         type="boolean",
+ *         description="Tüm gün etkinliği mi?",
+ *         example=false
+ *     ),
+ *     @OA\Property(
+ *         property="location",
+ *         type="string",
+ *         nullable=true,
+ *         maxLength=255,
+ *         description="Etkinlik konumu",
+ *         example="Toplantı Odası 1"
+ *     )
+ * )
+ */
 class CalendarEventRequest extends FormRequest
 {
     public function authorize(): bool

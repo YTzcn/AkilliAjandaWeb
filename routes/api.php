@@ -7,6 +7,7 @@ use Gemini\Laravel\Facades\Gemini;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EventController;
 
 // Kullanıcı bilgisi
 Route::middleware('ensure.auth')->get('/user', function (Request $request) {
@@ -62,4 +63,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+    // Event Routes
+    Route::prefix('events')->group(function () {
+        Route::get('/', [EventController::class, 'index']);
+        Route::post('/', [EventController::class, 'store']);
+        Route::get('/{event}', [EventController::class, 'show']);
+        Route::put('/{event}', [EventController::class, 'update']);
+        Route::delete('/{event}', [EventController::class, 'destroy']);
+        Route::get('/calendar/{year}/{month}', [EventController::class, 'getMonthlyEvents']);
+        Route::get('/upcoming', [EventController::class, 'getUpcomingEvents']);
+        Route::post('/{event}/share', [EventController::class, 'shareEvent']);
+        Route::post('/{event}/reminder', [EventController::class, 'setReminder']);
+    });
 });

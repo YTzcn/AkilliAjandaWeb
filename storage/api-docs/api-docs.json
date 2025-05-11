@@ -613,9 +613,490 @@
                     }
                 ]
             }
+        },
+        "/api/events": {
+            "get": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Etkinlikleri listele",
+                "operationId": "e529c81e6aaec82f49950a87ed881f57",
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Başlangıç tarihi",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end",
+                        "in": "query",
+                        "description": "Bitiş tarihi",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Yeni etkinlik oluştur",
+                "operationId": "e958e1c6c275d5f9b7ebcd837903d0ef",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CalendarEventRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "event": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/events/{event}": {
+            "get": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Etkinlik detaylarını getir",
+                "operationId": "2f5e4d4d8d7989ca1f72be9c20d9daac",
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "description": "Etkinlik ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Etkinlik güncelle",
+                "operationId": "0c0cf4026635d252353fad3e5b48591c",
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "description": "Etkinlik ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CalendarEventRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "event": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Etkinlik sil",
+                "operationId": "b9043fb311444b3c3bcb101e1a643a9f",
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "description": "Etkinlik ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/events/calendar/{year}/{month}": {
+            "get": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Aylık etkinlikleri getir",
+                "operationId": "a1b913e85d12091c474d6e8d2c4bf997",
+                "parameters": [
+                    {
+                        "name": "year",
+                        "in": "path",
+                        "description": "Yıl",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "month",
+                        "in": "path",
+                        "description": "Ay",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/events/upcoming": {
+            "get": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Yaklaşan etkinlikleri getir",
+                "operationId": "535f4fd11e4c16d48c066f2dc8bcf75a",
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/events/{event}/share": {
+            "post": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Etkinliği paylaş",
+                "operationId": "1dca4ca8cf7357bf63cc7a02da6cce61",
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "description": "Etkinlik ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "users"
+                                ],
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/events/{event}/reminder": {
+            "post": {
+                "tags": [
+                    "Etkinlikler"
+                ],
+                "summary": "Etkinlik hatırlatıcısı ayarla",
+                "operationId": "199b8e0b4e857f9472b013060bd251b2",
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "description": "Etkinlik ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "reminder_time"
+                                ],
+                                "properties": {
+                                    "reminder_time": {
+                                        "description": "Hatırlatma süresi (dakika cinsinden)",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CalendarEventRequest": {
+                "title": "Takvim Etkinliği İsteği",
+                "description": "Takvim etkinliği oluşturma ve güncelleme için kullanılan form request",
+                "required": [
+                    "title",
+                    "start_date",
+                    "end_date"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "Etkinlik başlığı",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Toplantı"
+                    },
+                    "description": {
+                        "description": "Etkinlik açıklaması",
+                        "type": "string",
+                        "example": "Haftalık ekip toplantısı",
+                        "nullable": true
+                    },
+                    "start_date": {
+                        "description": "Başlangıç tarihi ve saati",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-03-20T10:00:00"
+                    },
+                    "end_date": {
+                        "description": "Bitiş tarihi ve saati",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-03-20T11:00:00"
+                    },
+                    "all_day": {
+                        "description": "Tüm gün etkinliği mi?",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "location": {
+                        "description": "Etkinlik konumu",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Toplantı Odası 1",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
         }
     },
     "tags": [
+        {
+            "name": "Etkinlikler",
+            "description": "Etkinlik yönetimi için API endpoint'leri"
+        },
         {
             "name": "Kimlik Doğrulama",
             "description": "Kimlik Doğrulama"
