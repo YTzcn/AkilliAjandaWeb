@@ -21,6 +21,18 @@ use App\Mail\VerificationCodeMail;
  *     title="AkilliAjanda API Dokümantasyonu",
  *     description="AkilliAjanda mobil uygulaması için API dokümantasyonu",
  * )
+ * 
+ * @OA\Server(
+ *     url="",
+ *     description="API Sunucusu"
+ * )
+ * 
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
  */
 class AuthController extends Controller
 {
@@ -78,7 +90,11 @@ class AuthController extends Controller
             'email_verification_code_expires_at' => now()->addMinutes(30),
         ]);
 
-        Mail::to($user->email)->send(new VerificationCodeMail($user));
+        Mail::to($user->email)->send(new VerificationCodeMail(
+            $user->email_verification_code, 
+            $user->email_verification_code_expires_at, 
+            $user->name
+        ));
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -269,7 +285,11 @@ class AuthController extends Controller
         $user->email_verification_code_expires_at = now()->addMinutes(30);
         $user->save();
 
-        Mail::to($user->email)->send(new VerificationCodeMail($user));
+        Mail::to($user->email)->send(new VerificationCodeMail(
+            $user->email_verification_code, 
+            $user->email_verification_code_expires_at, 
+            $user->name
+        ));
 
         return response()->json([
             'status' => 'success',

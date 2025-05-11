@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Task;
 use App\Repositories\TaskRepository;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -52,6 +53,37 @@ class TaskService
     public function getCompletedTasks(): Collection
     {
         return $this->taskRepository->getCompletedTasks(Auth::id());
+    }
+
+    /**
+     * Get tasks by priority level for the authenticated user.
+     *
+     * @param int $level
+     * @return Collection
+     */
+    public function getTasksByPriority(int $level): Collection
+    {
+        return $this->taskRepository->getByPriority(Auth::id(), $level);
+    }
+
+    /**
+     * Get tasks due today for the authenticated user.
+     *
+     * @return Collection
+     */
+    public function getTasksDueToday(): Collection
+    {
+        return $this->taskRepository->getDueToday(Auth::id());
+    }
+
+    /**
+     * Get overdue tasks for the authenticated user.
+     *
+     * @return Collection
+     */
+    public function getOverdueTasks(): Collection
+    {
+        return $this->taskRepository->getOverdue(Auth::id());
     }
 
     /**

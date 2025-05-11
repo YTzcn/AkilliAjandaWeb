@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\TaskController;
 
 // Kullanıcı bilgisi
 Route::middleware('ensure.auth')->get('/user', function (Request $request) {
@@ -35,7 +36,8 @@ Route::prefix('messages')->group(function () {
     Route::get('/statistics', [MessageController::class, 'getStatistics']);
 });
 
-Route::middleware('auth')->group(function () {
+// Chat endpoint
+Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat/send', [App\Http\Controllers\API\ChatController::class, 'send']);
 });
 
@@ -64,6 +66,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
+    // Google Calendar Routes
+    Route::prefix('google')->group(function () {
+        Route::get('/auth-url', [App\Http\Controllers\Api\GoogleCalendarController::class, 'getAuthUrl']);
+        Route::post('/callback', [App\Http\Controllers\Api\GoogleCalendarController::class, 'handleCallback']);
+        Route::post('/disconnect', [App\Http\Controllers\Api\GoogleCalendarController::class, 'disconnect']);
+        Route::get('/events', [App\Http\Controllers\Api\GoogleCalendarController::class, 'listEvents']);
+        Route::post('/import-events', [App\Http\Controllers\Api\GoogleCalendarController::class, 'importEvents']);
+        Route::get('/connection-status', [App\Http\Controllers\Api\GoogleCalendarController::class, 'connectionStatus']);
+        
+        // Dışa aktarma/senkronizasyon rotaları
+        Route::post('/sync-event', [App\Http\Controllers\Api\GoogleCalendarController::class, 'syncEventToGoogle']);
+        Route::delete('/remove-event/{event_id}', [App\Http\Controllers\Api\GoogleCalendarController::class, 'removeEventFromGoogle']);
+        Route::post('/sync-all-events', [App\Http\Controllers\Api\GoogleCalendarController::class, 'syncAllEventsToGoogle']);
+        Route::post('/sync-tasks', [App\Http\Controllers\Api\GoogleCalendarController::class, 'syncTasksToGoogle']);
+    });
+
     // Event Routes
     Route::prefix('events')->group(function () {
         Route::get('/', [EventController::class, 'index']);
@@ -71,9 +89,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{event}', [EventController::class, 'show']);
         Route::put('/{event}', [EventController::class, 'update']);
         Route::delete('/{event}', [EventController::class, 'destroy']);
-        Route::get('/calendar/{year}/{month}', [EventController::class, 'getMonthlyEvents']);
-        Route::get('/upcoming', [EventController::class, 'getUpcomingEvents']);
-        Route::post('/{event}/share', [EventController::class, 'shareEvent']);
-        Route::post('/{event}/reminder', [EventController::class, 'setReminder']);
+    });
+    
+    // Task Routes
+    Route::prefix('tasks')->group(function () {
+        Route::get('/', [TaskController::class, 'index']);
+        Route::post('/', [TaskController::class, 'store']);
+        Route::get('/{task}', [TaskController::class, 'show']);
+        Route::put('/{task}', [TaskController::class, 'update']);
+        Route::delete('/{task}', [TaskController::class, 'destroy']);
     });
 });

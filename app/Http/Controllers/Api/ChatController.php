@@ -7,6 +7,12 @@ use App\Services\LLM\LLMService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(
+ *     name="Sohbet",
+ *     description="Yapay zeka sohbet asistanı işlemleri"
+ * )
+ */
 class ChatController extends Controller
 {
     /**
@@ -26,6 +32,41 @@ class ChatController extends Controller
 
     /**
      * Kullanıcı mesajını işler ve yanıt döner
+     *
+     * @OA\Post(
+     *     path="/api/chat/send",
+     *     summary="Yapay zeka asistanına mesaj gönder",
+     *     description="Kullanıcı mesajını işler ve yapay zeka asistanından yanıt döner",
+     *     tags={"Sohbet"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"message"},
+     *             @OA\Property(property="message", type="string", example="Merhaba, bugün için yapılacaklar listemi oluşturabilir misin?"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Başarılı",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="response", type="string", example="Merhaba! Tabii ki, işte sizin için bir yapılacaklar listesi önerisi..."),
+     *             @OA\Property(property="type", type="string", example="Yapay Zeka Asistan"),
+     *             @OA\Property(property="is_successful", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Hata",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Mesaj işlenirken bir hata oluştu"),
+     *             @OA\Property(property="type", type="string", example="error"),
+     *             @OA\Property(property="is_successful", type="boolean", example=false)
+     *         )
+     *     )
+     * )
      *
      * @param Request $request
      * @return JsonResponse
