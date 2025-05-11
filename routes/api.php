@@ -6,6 +6,7 @@ use App\Http\Controllers\LLMController;
 use Gemini\Laravel\Facades\Gemini;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\Api\AuthController;
 
 // Kullanıcı bilgisi
 Route::middleware('ensure.auth')->get('/user', function (Request $request) {
@@ -24,48 +25,6 @@ Route::prefix('llm')->group(function () {
     Route::get('/models', [LLMController::class, 'listModels']);
 });
 
-// Gemini modelleri listesi
-Route::get('/models', function(){
-    try {
-        $response = Gemini::models()->list();
-        return response()->json([
-            'success' => true,
-            'models' => $response->models ?? []
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'error_trace' => app()->environment('production') ? null : $e->getTraceAsString()
-        ], 500);
-    }
-});
-
-// Gemini model testi - doğrudan bir prompt göndererek test etmek için
-Route::post('/test-model', function(Request $request){
-    try {
-        $request->validate([
-            'prompt' => 'required|string',
-            'model' => 'nullable|string'
-        ]);
-        
-        $model = $request->input('model', 'gemini-1.5-pro');
-        $response = Gemini::generativeModel($model)->generateContent($request->input('prompt'));
-        
-        return response()->json([
-            'success' => true,
-            'response' => $response->text()
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'error_trace' => app()->environment('production') ? null : $e->getTraceAsString()
-        ], 500);
-    }
-});
-
-// Message routes
 Route::prefix('messages')->group(function () {
     Route::get('/', [MessageController::class, 'index']);
     Route::get('/date-range', [MessageController::class, 'getByDateRange']);
@@ -88,4 +47,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{notification}', [App\Http\Controllers\Api\NotificationController::class, 'destroy']);
     Route::post('/save-device-token', [DeviceController::class, 'saveToken']);
+});
+
+// Auth Routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+// Protected Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
 });
