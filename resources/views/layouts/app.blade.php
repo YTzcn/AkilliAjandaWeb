@@ -4,8 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @auth
+    <meta name="user-id" content="{{ auth()->id() }}">
+    <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
+    <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
+    @endauth
 
     <title>{{ config('app.name', 'AkilliAjanda') }}</title>
+
+    <!-- Pusher CDN -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
     <!-- Sweetalert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

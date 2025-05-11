@@ -454,6 +454,7 @@
 @endsection
 
 @section('content')
+
 <div class="container-fluid">
     <!-- Başlık ve Tarih -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1177,6 +1178,68 @@ document.addEventListener('DOMContentLoaded', function() {
     // Widget buton click olayları
     addEventButton.addEventListener('click', () => showAddModal('event'));
     addTaskButton.addEventListener('click', () => showAddModal('task'));
+
+    // Pusher entegrasyonu
+    try {
+        const userId = "{{ auth()->id() }}";
+        const pusherKey = "{{ config('broadcasting.connections.pusher.key') }}";
+        const pusherCluster = "{{ config('broadcasting.connections.pusher.options.cluster') }}";
+
+        console.log('Pusher bağlantısı başlatılıyor...', {
+            userId: userId,
+            pusherKey: pusherKey,
+            pusherCluster: pusherCluster
+        });
+
+        const pusher = new Pusher(pusherKey, {
+            cluster: pusherCluster,
+            encrypted: true
+        });
+
+        const channel = pusher.subscribe(`calendar-${userId}`);
+        
+        channel.bind('calendar-update', function(data) {
+            console.log('Takvim güncellemesi alındı:', data);
+            
+            if (calendar) {
+                console.log('Takvim yenileniyor...');
+                calendar.refetchEvents();
+                
+                // Bildirim göster
+                const messages = {
+                    'created': 'eklendi',
+                    'updated': 'güncellendi',
+                    'deleted': 'silindi'
+                };
+                
+                const type = data.type === 'event' ? 'Etkinlik' : 'Görev';
+                const action = messages[data.action];
+                
+                Swal.fire({
+                    title: 'Takvim Güncellendi',
+                    text: `Bir ${type} ${action}!`,
+                    icon: 'info',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            } else {
+                console.warn('Takvim objesi bulunamadı');
+            }
+        });
+
+        channel.bind('pusher:subscription_succeeded', () => {
+            console.log('Pusher bağlantısı başarılı');
+        });
+
+        channel.bind('pusher:subscription_error', (error) => {
+            console.error('Pusher bağlantısı başarısız:', error);
+        });
+
+    } catch (error) {
+        console.error('Pusher kurulum hatası:', error);
+    }
 });
 
 // Chat İşlevleri

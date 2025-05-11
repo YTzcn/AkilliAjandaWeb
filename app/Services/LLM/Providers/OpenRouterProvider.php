@@ -14,7 +14,7 @@ class OpenRouterProvider implements ProviderInterface
      * 
      * @var string
      */
-    protected string $model = 'deepseek/deepseek-r1:free';
+    protected string $model = 'google/gemini-2.0-flash-exp:free';
     
     /**
      * OpenRouter API anahtarı

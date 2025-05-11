@@ -14,6 +14,8 @@ use App\View\Components\CustomAuthLayout;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\EventObserver;
+use App\Observers\TaskObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -58,5 +60,8 @@ class AppServiceProvider extends ServiceProvider
         
         // Register custom blade components
         Blade::component('custom-auth-layout', CustomAuthLayout::class);
+
+        Event::observe(EventObserver::class);
+        Task::observe(TaskObserver::class);
     }
 }
