@@ -28,6 +28,17 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Ekstra güvenlik kontrolü
+        if (!Auth::user()->hasVerifiedEmail()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('login')
+                ->withErrors(['email' => 'E-posta adresinizi doğrulamanız gerekmektedir.'])
+                ->withInput($request->only('email'));
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

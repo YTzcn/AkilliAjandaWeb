@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Mail\VerificationCodeMail;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,13 +49,11 @@ class RegisteredUserController extends Controller
             'email_verification_code_expires_at' => $expiresAt,
         ]);
 
-        event(new Registered($user));
-
         Auth::login($user);
 
         // Doğrulama kodunu e-posta ile gönder
         Mail::to($user->email)->send(new VerificationCodeMail($code, $expiresAt, $user->name));
 
-        return redirect()->route('verification.notice');
+        return redirect()->route('verification.code');
     }
 }

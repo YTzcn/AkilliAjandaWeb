@@ -27,7 +27,9 @@ Route::get('/', function () {
 // Özel middleware ile korunan rotalar
 Route::middleware(['ensure.auth'])->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
     
     // Events
     Route::resource('events', EventController::class);

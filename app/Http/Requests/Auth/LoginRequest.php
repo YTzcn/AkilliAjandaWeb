@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -41,15 +42,30 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        // Önce kullanıcıyı bul
+        $user = User::where('email', $this->email)->first();
 
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+        // Kullanıcı varsa ve şifresi doğruysa devam et
+        if ($user && password_verify($this->password, $user->password)) {
+            // E-posta doğrulanmamışsa hata ver
+            if (!$user->hasVerifiedEmail()) {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => __('E-posta adresinizi doğrulamanız gerekmektedir.'),
+                ]);
+            }
+
+            // Giriş yap
+            Auth::login($user, $this->boolean('remember'));
+            RateLimiter::clear($this->throttleKey());
+            return;
         }
 
-        RateLimiter::clear($this->throttleKey());
+        // Kullanıcı yoksa veya şifre yanlışsa
+        RateLimiter::hit($this->throttleKey());
+        throw ValidationException::withMessages([
+            'email' => trans('auth.failed'),
+        ]);
     }
 
     /**
@@ -59,7 +75,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
