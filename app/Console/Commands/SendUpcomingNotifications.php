@@ -3,11 +3,15 @@
 namespace App\Console\Commands;
 
 use App\Helpers\NotificationHelper;
+use App\Mail\UpcomingNotification;
 use App\Models\Event;
 use App\Models\Task;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
 class SendUpcomingNotifications extends Command
 {
     /**
@@ -63,6 +67,7 @@ class SendUpcomingNotifications extends Command
         $upcomingEvents = Event::where('start_date', '>', Carbon::now())
             ->where('start_date', '<=', Carbon::now()->addMinutes(30))
             ->where('notification_sent', false)
+            ->with('user') // Kullanıcı bilgilerini eager loading ile al
             ->get();
 
         foreach ($upcomingEvents as $event) {
@@ -71,10 +76,34 @@ class SendUpcomingNotifications extends Command
             $title = '📅 Yaklaşan Etkinlik Hatırlatması';
             $body = "{$event->title} etkinliği {$timeUntilStart} dakika içinde başlayacak!";
             
-            if ($this->sendNotificationWithRetry($event->user_id, $title, $body, [
+            // Push bildirimi gönder
+            $pushSent = $this->sendNotificationWithRetry($event->user_id, $title, $body, [
                 'type' => 'event',
                 'event_id' => $event->id
-            ])) {
+            ]);
+
+            // E-posta gönder
+            try {
+                Mail::to($event->user->email)->send(new UpcomingNotification(
+                    $title,
+                    $body,
+                    'event',
+                    $event->id,
+                    $event->title,
+                    $timeUntilStart
+                ));
+                $emailSent = true;
+            } catch (\Exception $e) {
+                Log::error('E-posta gönderme hatası:', [
+                    'error' => $e->getMessage(),
+                    'event_id' => $event->id,
+                    'user_id' => $event->user_id
+                ]);
+                $emailSent = false;
+            }
+
+            // Eğer push veya e-posta bildirimlerinden en az biri başarılıysa
+            if ($pushSent || $emailSent) {
                 $event->update(['notification_sent' => true]);
             }
         }
@@ -87,6 +116,7 @@ class SendUpcomingNotifications extends Command
             ->where('due_date', '<=', Carbon::now()->endOfDay())
             ->where('is_completed', false)
             ->where('notification_sent', false)
+            ->with('user') // Kullanıcı bilgilerini eager loading ile al
             ->get();
 
         foreach ($upcomingTasks as $task) {
@@ -99,12 +129,35 @@ class SendUpcomingNotifications extends Command
                 $body = "⚠️ {$task->title} görevinin teslim tarihine {$timeUntilDue} saat kaldı!";
             }
             
-            if ($this->sendNotificationWithRetry($task->user_id, $title, $body, [
+            // Push bildirimi gönder
+            $pushSent = $this->sendNotificationWithRetry($task->user_id, $title, $body, [
                 'type' => 'task',
                 'task_id' => $task->id
-            ])) {
+            ]);
+
+            // E-posta gönder
+            try {
+                Mail::to($task->user->email)->send(new UpcomingNotification(
+                    $title,
+                    $body,
+                    'task',
+                    $task->id,
+                    $task->title,
+                    $timeUntilDue
+                ));
+                $emailSent = true;
+            } catch (\Exception $e) {
+                Log::error('E-posta gönderme hatası:', [
+                    'error' => $e->getMessage(),
+                    'task_id' => $task->id,
+                    'user_id' => $task->user_id
+                ]);
+                $emailSent = false;
+            }
+
+            // Eğer push veya e-posta bildirimlerinden en az biri başarılıysa
+            if ($pushSent || $emailSent) {
                 $task->update(['notification_sent' => true]);
-                
             }
         }
     }
