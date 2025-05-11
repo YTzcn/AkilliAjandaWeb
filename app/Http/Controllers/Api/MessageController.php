@@ -23,7 +23,6 @@ class MessageController extends Controller
     public function __construct(MessageService $messageService)
     {
         $this->messageService = $messageService;
-        $this->middleware('auth:sanctum');
     }
 
     /**
