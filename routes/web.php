@@ -85,4 +85,9 @@ Route::middleware(['ensure.auth'])->group(function () {
     Route::get('/calendar/settings', [App\Http\Controllers\CalendarSyncController::class, 'settings'])->name('calendar.settings');
 });
 
+Route::middleware(['ensure.auth'])->group(function () {
+    Route::post('/save-device-token', [App\Http\Controllers\DeviceController::class, 'saveToken'])->name('save.device.token');
+    Route::post('/delete-device-token', [App\Http\Controllers\DeviceController::class, 'deleteToken'])->name('delete.device.token');
+});
+
 require __DIR__.'/auth.php';

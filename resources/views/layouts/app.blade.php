@@ -7,6 +7,16 @@
 
     <title>{{ config('app.name', 'AkilliAjanda') }}</title>
 
+    <!-- Sweetalert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
+    
+    <!-- Firebase initialization script -->
+    <script src="{{ asset('js/firebase.js') }}"></script>
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -96,7 +106,7 @@
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <form method="POST" action="{{ route('logout') }}">
+                                <form method="POST" action="{{ route('logout') }}" id="logout-form">
                                     @csrf
                                     <button type="submit" class="dropdown-item">Çıkış Yap</button>
                                 </form>

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LLMController;
 use Gemini\Laravel\Facades\Gemini;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\DeviceController;
 
 // Kullanıcı bilgisi
 Route::middleware('ensure.auth')->get('/user', function (Request $request) {
@@ -86,4 +87,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/{notification}/mark-as-read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
     Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{notification}', [App\Http\Controllers\Api\NotificationController::class, 'destroy']);
+    Route::post('/save-device-token', [DeviceController::class, 'saveToken']);
 });
