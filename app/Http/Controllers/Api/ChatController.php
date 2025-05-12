@@ -78,6 +78,12 @@ class ChatController extends Controller
                 'message' => 'required|string|max:1000'
             ]);
 
+            \Log::debug('Chat request:', [
+                'message' => $request->message,
+                'api_key' => config('services.openrouter.api_key'),
+                'user' => auth()->user()
+            ]);
+
             $response = $this->llmService->processUserMessage($request->message);
 
             return response()->json([

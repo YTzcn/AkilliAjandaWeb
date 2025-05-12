@@ -16,22 +16,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificationCodeMail;
 
 /**
- * @OA\Info(
- *     version="1.0.0",
- *     title="AkilliAjanda API Dokümantasyonu",
- *     description="AkilliAjanda mobil uygulaması için API dokümantasyonu",
- * )
- * 
- * @OA\Server(
- *     url="",
- *     description="API Sunucusu"
- * )
- * 
- * @OA\SecurityScheme(
- *     securityScheme="bearerAuth",
- *     type="http",
- *     scheme="bearer",
- *     bearerFormat="JWT"
+ * @OA\Tag(
+ *     name="Kimlik Doğrulama",
+ *     description="Kullanıcı kaydı, girişi ve hesap yönetimi için API endpoint'leri"
  * )
  */
 class AuthController extends Controller

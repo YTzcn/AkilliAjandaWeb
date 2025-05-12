@@ -1,13 +1,21 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "AkilliAjanda API Dokümantasyonu",
-        "description": "AkilliAjanda mobil uygulaması için API dokümantasyonu",
+        "title": "Akıllı Ajanda API Dokümantasyonu",
+        "description": "Akıllı Ajanda uygulamasının API endpoint'leri",
+        "contact": {
+            "name": "Akıllı Ajanda Destek",
+            "email": "admin@akilliajanda.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
         "version": "1.0.0"
     },
     "servers": [
         {
-            "url": "",
+            "url": "http://my-default-host.com",
             "description": "API Sunucusu"
         }
     ],
@@ -708,6 +716,164 @@
                 "security": [
                     {
                         "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/device/token": {
+            "post": {
+                "tags": [
+                    "Cihaz Yönetimi"
+                ],
+                "summary": "FCM token'ı kaydeder veya günceller",
+                "description": "Kullanıcının cihazı için FCM token'ı kaydeder. Aynı cihaz tipi için önceki kayıt varsa günceller.",
+                "operationId": "05239b1ac9a009b186e6ac1097712d08",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "device_token",
+                                    "device_type"
+                                ],
+                                "properties": {
+                                    "device_token": {
+                                        "description": "Firebase Cloud Messaging (FCM) token",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "fMEI3X...Kg5:APA91b..."
+                                    },
+                                    "device_type": {
+                                        "description": "Cihaz tipi",
+                                        "type": "string",
+                                        "enum": [
+                                            "android",
+                                            "ios",
+                                            "web"
+                                        ],
+                                        "example": "android"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token başarıyla kaydedildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "FCM token başarıyla kaydedildi"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "device_token": {
+                                                    "type": "string",
+                                                    "example": "fMEI3X...Kg5:APA91b..."
+                                                },
+                                                "device_type": {
+                                                    "type": "string",
+                                                    "example": "android"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Geçersiz veri",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Geçersiz veri"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "device_token": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "device_token alanı zorunludur"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Yetkisiz erişim",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "FCM token kaydedilirken bir hata oluştu"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
                     }
                 ]
             }
@@ -2291,7 +2457,7 @@
             }
         },
         "securitySchemes": {
-            "bearerAuth": {
+            "sanctum": {
                 "type": "http",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
@@ -2300,8 +2466,16 @@
     },
     "tags": [
         {
+            "name": "Kimlik Doğrulama",
+            "description": "Kullanıcı kaydı, girişi ve hesap yönetimi için API endpoint'leri"
+        },
+        {
             "name": "Sohbet",
             "description": "Yapay zeka sohbet asistanı işlemleri"
+        },
+        {
+            "name": "Cihaz Yönetimi",
+            "description": "FCM (Firebase Cloud Messaging) token yönetimi için API endpoint'leri"
         },
         {
             "name": "Etkinlikler",
@@ -2314,10 +2488,6 @@
         {
             "name": "Görevler",
             "description": "Görev yönetimi ile ilgili API endpointleri"
-        },
-        {
-            "name": "Kimlik Doğrulama",
-            "description": "Kimlik Doğrulama"
         }
     ]
 }

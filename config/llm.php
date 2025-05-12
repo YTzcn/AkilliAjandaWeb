@@ -25,7 +25,7 @@ return [
             'default' => env('GEMINI_DEFAULT_MODEL', 'gemini-1.5-pro'),
         ],
         'openai' => [
-            'default' => env('OPENAI_DEFAULT_MODEL', 'gpt-4o'),
+            'default' => env('OPENAI_DEFAULT_MODEL', 'gpt-4o-mini-2024-07-18'),
         ],
         'openrouter' => [
             'default' => env('OPENROUTER_DEFAULT_MODEL', 'anthropic/claude-3-opus'),
