@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Demo Kullanıcı',
             'email' => 'demo@example.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
         ]);
 
         // Bugünün tarihini al

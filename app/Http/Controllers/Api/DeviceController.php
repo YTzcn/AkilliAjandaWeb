@@ -134,6 +134,9 @@ class DeviceController extends Controller
                 ], 422);
             }
 
+            // Kayıt eklemeden önce aynı device_token başka bir kayıtta var mı kontrol et ve force delete ile tamamen sil
+            UserDevices::withTrashed()->where('device_token', $request->device_token)->forceDelete();
+
             // Mevcut token'ı kontrol et ve güncelle veya yeni kayıt oluştur
             $device = UserDevices::updateOrCreate(
                 [
