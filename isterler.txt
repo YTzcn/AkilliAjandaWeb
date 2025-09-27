@@ -1,0 +1,86 @@
+
+YMH212 YAZILIM GEREKSİNİMLERİ VE ANALİZİ DERSİ PROJE/ÖDEV
+DEĞERLENDİRME KRİTERLERİ
+-Projeler, YMH212 dersinde anlatılan kriterlere göre yapılmalı ve rapor düzenine uyulmalıdır.
+-Proje ödevinde sayfa sınırı yoktur. İçeriğe bağlı olarak değerlendirilecektir. -Teslim edilen Proje dosyası içerisine, yapılan tüm çalışma dosyalarının Edit❜lenebilecek formatları dahil (.doc, .vsd, .psd, gibi formatları ayrıca tamamı .pdf olarak) dijital ortamlarda teslim edilecektir.
+Proje içerisindeki bölümlerde olması gereken zorunlu çizelgeler, şekiller, diyagramlar aşağıda belirtilmiştir.
+-Genel olarak metinde Times New Roman, 12 punto, 1.5 satır aralığı, iki yana yaslı metin kullanılmalıdır.
+PROJE DÖKÜMANTASYONUNDA BULUNMASI GEREKEN BÖLÜMLER VE AÇIKLAMALARI
+1.Bölüm - Tanıtım Bu kısımda projenin amacı, kapsamı ve genel tanıtımı yapılmalıdır. Proje özeti verilmeli, sorun ve hedef analizi yapılmalıdır. Sorun ve hedef analizi ile ilgili kısa bir açıklama ödev olarak verilecek "projelere stratejik bakış" dokümanında yer almaktadır. Ayrıca Vision scope document mantığı ve örnekleri incelenebilir. 2.Bölüm - Planlama
+-Gant diyagramı çizilmelidir (Maliyet kestirim dökümanı doğrultusunda oluşturulacaktır). -Ekip yapısı şematik olarak verilmeli ayrıca bunların zaman iş planları gösterilmelidir. - Projenin insan kaynakları, donanım kaynakları ve yazılım kaynakları verilmelidir. - Proje planı içerisindeki alt planlama başlıkları için gant diyagramları verilmeli ve bu planlama aşamaları için yer alacak ekiplerin yapısı, zaman/iş planları ve her bir planlama aşamasında kullanılacak kaynaklar yazılmalıdır
+3.Bölüm - Çözümleme
+-Bu kısımda konu ile alakalı örnek bir mevcut sistemin use case diyagramı ve sistemin işleyiş senaryosu verilmelidir [1].
+-Mevcut sistemin eksik yönleri belirlenerek önerdiğiniz sistemin bu eksikliklerden hangilerine nasıl çözüm getirdiği açıklanmalıdır.
+Mevcut sistemin arayüzleri, işleyiş mantığı, bileşen/modül vb yapıları kısaca tanıtılacaktır.
+- Önerilen sistemin İşlevsel Model başlığı altında Use case diyagramları çizilmeli ve her bir senaryo için Text formatında senaryolar yazılmalıdır.
+-Bilgi sistemleri/Nesneler başlığı altında önerilen sistemin Sınıf diyagramları çizilecek her bir sınıfın kullanım amacı kısaca açıklanacak senaryolarla ilişkisi verilecektir. - Sınıfların nasıl kullanılacağı veri modelinde açıklanacak gerekirse veri tabanı yapısı ile ilişkisi verilecektir.
+-Önerilen sistemin Derste/Laboratuvarda anlatılan tüm UML diyagramları eksiksiz
+verilecektir.
+- Önerilen sistemin arayüzleri kısaca tanıtılacaktır. Verilen arayüzlerin maliyet kestirim dokümanında kullanılıp kullanılmadığı incelenecektir. Kodlama yapılsa da yapılmasa da sistemde ne tür arayüzler kullanılacağı belirtilmelidir.
+4.Bölüm - Tasarım
+- Sistemin tasarım mimarisi akış diyagramı olarak verilmelidir. Ancak diyagramın dışında verdiğiniz mimarinin açıklaması seçim nedenleri ile birlikte detaylı verilmelidir. - Tasarım aşamasında her bir arabirim için kullanım amacı, üzerinde çalışacağı veri modeli, hangi testlerin uygulanacağı ve performans kriterlerinin ne olacağı verilmelidir. Arabirim tasarımların yapılmasının ardından fonksiyonel gereksinimleri sağlayacak modüllerin neler olacağı verilmelidir. Her bir modül için tasarımı, kullanıcı profilleri,
+
+
+
+entegrasyon ve test işlemlerinin nasıl yapılacağı akış diyagramı şeklinde verilmelidir. - Varsa ortak alt sistemler açıklanmalı, modüller arası ortak veriler belirtilmelidir.
+5.Bölüm - Gerçekleştirme
+- Önerilen sistem gerçekleştirilirken hangi programlama dilinin ve araçlarının, hangi teknolojilerin neden seçildiği açıklanacaktır.
+- Veri tabanı yönetim sisteminin mimarisi verilmelidir. Çözümleme aşamasında verilen veri modeliyle ilişkili olmasına dikkat edilecektir.
+-Gerçekleştirme aşamasında kullanılan standartlar verilmelidir.
+-Gerçekleştirim aşamasında meydana gelebilecek olağan dışı durumlar belirlenmeli nasıl yönetileceği kısaca açıklanmalıdır.
+-Kod gözden geçirme işleminin nasıl yapılacağı verilmelidir.
+6.Bölüm - Test
+-Doğrulama ve geçerleme işlemlerinin nasıl yapılacağına ilişkin iş zaman planı gant diyagramı olarak verilmelidir. (planlama aşamasında verilen test planı ile uyumlu olmasına dikkat edilecektir).
+-Test (doğrulama) planı için hangi yöntemlerin neden ve nasıl kullanıldığı detaylı olarak açıklanmalıdır.
+-Kullanılacak test araçları varsa işleyişi kısaca açıklanmalıdır.
+- Önerilen sistem gerçekleştirilirken hangi test türü ve araçlarının neden seçildiği açıklanacaktır.
+7.Bölüm - Bakım
+- Yazılım kurulum aktiviteleri hakkında bilgiler verilmelidir.
+-Kurulum sonrasında yerinde destek organizasyonu tarif edilmelidir.
+-Kurulum ve entegrasyon aşamalarında yapılacaklar hakkında bilgiler
+verilmelidir.
+8.Bölüm - Sonuç
+-Bu bölümde gerçekleştirilen uygulamanın detaylı bir biçimde değerlendirilmesi yapılmalıdır.
+-Gerçekleştirilen sistemin mevcut sistemlerden farkı net bir biçimde ortaya konulmalıdır. -Gerçekleştirilen sistemin hangi probleme çözüm ürettiği belirtilmelidir.
+- Gerçekleştirilen sistemin mevcut sistemlere göre avantajları ve
+dezavantajları, kısıtları (limitations) anlatılmalı, sistem benzer diğer sistemlerle tablolar ile karşılaştırılmalıdır.
+-Gerçekleştirilen sistemin dezavantajları değerlendirilerek gelecekte nasıl iyileştirilebileceği detayları ile anlatılmalıdır.
+9.Bölüm - Kaynaklar
+-Geliştirme süreçlerinin her aşamasında yararlanılan kaynaklar (Kitap, Makale, Ders Notu, İnternet Sitesi vb) numaralandırılarak yazılmalıdır.
+-Buradaki kaynaklar sadece yararlanıldığı anlamında olmayıp, doküman içerisinde kaç
+numaralı kaynaktan nerede yararlanıldığı kaynak göstererek verilmelidir.
+Yapılacak Doküman: SRS + SAD dokümanı şeklinde olacaktır.
+Dokümanda Mutlaka Bulunması Gereken Unsurlar:
+İş Zaman Çizelgesi.
+UML Diyagramlarının tamamı.
+ERD Diyagramları. Varlık ilişki diyagramları
+Veri Sözlüğü.
+Veri akış diyagramlar.
+İş akış diyagramları.
+Veri tabanı diyagramları.
+
+
+
+Rich Picture.
+Context Diyagramı.
+Mimari yapıları gösteren diyagramlar.
+Alt sistemleri gösteren diyagramlar.
+EK olarak değerlendirmenizi istediğimiz hususları da şöyle özetlemeye karar verdik:
+Risk Analizi ve Yönetimi
+Proje sırasında karşılaşılabilecek risklerin belirlenmesi ve bu risklerin nasıl yönetileceğine dair stratejiler belirtilmelidir. Risklerin olasılık ve etkilerini içeren bir risk matrisi oluşturulabilir.
+Sürdürülebilirlik ve Güvenlik Önlemleri
+Özellikle güvenlik gereksinimlerini ele alan bir bölüm eklenmelidir. Yazılımın sürdürülebilirliği ve uzun vadeli bakım stratejileri hakkında detay verilebilir.
+Kullanıcı Deneyimi (UX) Değerlendirmesi
+Kullanıcı arayüzü için kullanılabilirlik testleri ve kullanıcı geri bildirimlerine dayalı geliştirme süreçleri belirtilmelidir. Bunu ekibinizle birlikte oluşturacağınız anket, A/B testleri gibi yapılarla elde edip bizimle paylaşmanız gerekmektedir.
+DevOps ve Sürekli Entegrasyon/Sürekli Dağıtım (CI/CD)
+Yazılımın geliştirme ve dağıtım süreçlerinde hangi otomasyon araçlarının kullanıldığı açıklanmalıdır. Sürüm kontrol sistemleri (örn. Git) ve kod yönetimi süreçleri belirtilmelidir.
+Yasal ve Etik Hususlar
+Yazılımın kullanımına ilişkin yasal yükümlülükler ve etik konular değerlendirilebilir. (örn. GDPR uyumluluğu, lisans gereksinimleri).
+Müşteri ve Paydaş Geri Bildirim Süreci
+Proje geliştirme aşamasında müşteri veya paydaşlardan nasıl geri bildirim toplandığı açıklanmalıdır.
+Sistem Entegrasyonu ve API Yönetimi
+Önerilen sistemin dış sistemlerle nasıl entegre edileceğine dair bir açıklama eklenmelidir. API tasarım prensipleri, kullanılacak veri formatları (JSON, XML) gibi detaylar belirtilebilir.
+KAYNAKLAR
+1. Baykara M., "Bilgi Sistemleri ve Güvenliği Ders Notları", JISA, ss. 89-101, 2023.
+2.
+Doç. Dr. Muhammet BAYKARA

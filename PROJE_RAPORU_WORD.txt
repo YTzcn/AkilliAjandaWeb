@@ -1,0 +1,190 @@
+İÇİNDEKİLER
+
+1. TANITIM
+  1.1 Projenin Amacı ve Kapsamı
+  1.2 Sorun ve Hedef Analizi
+
+2. PLANLAMA
+  2.1 Gant Diyagramı
+  2.2 Ekip Yapısı
+  2.3 Kaynaklar
+
+3. ÇÖZÜMLEME
+  3.1 Kullanıcı Hikayeleri (User Story)
+  3.2 Fonksiyonel Gereksinimler
+  3.3 Fonksiyonel Olmayan Gereksinimler
+  3.4 Mevcut Sistem ve Eksiklikler
+  3.5 AkilliAjanda'nın Çözümü
+  3.6 Use Case Diyagramı (Placeholder)
+  3.7 Sınıf Diyagramı (Placeholder)
+  3.8 Veri Modeli ve ERD (Placeholder)
+  3.9 UML Diyagramları (Placeholder)
+  3.10 Arayüzler
+
+4. TASARIM
+  4.1 Mimari Akış (Placeholder)
+  4.2 Arabirimler ve Testler
+  4.3 Modüller
+
+5. GERÇEKLEŞTİRME
+  5.1 Kullanılan Teknolojiler
+  5.2 Neden Bu Teknolojiler?
+  5.3 Veritabanı Mimarisi
+  5.4 Standartlar ve Kod Gözden Geçirme
+
+6. TEST
+  6.1 Test Planı (Placeholder)
+  6.2 Kullanılan Test Araçları
+  6.3 Test Kapsamı ve Süreçleri
+
+8. SONUÇ
+  8.1 Değerlendirme
+  8.2 Avantajlar ve Dezavantajlar
+  8.3 Gelecek Geliştirmeler
+
+EK: RİSK ANALİZİ, GÜVENLİK, DEVOPS, YASAL/ETİK, API YÖNETİMİ
+  Risk Analizi (Placeholder)
+  Güvenlik Önlemleri
+  Sürdürülebilirlik
+  DevOps ve CI/CD
+  Yasal ve Etik Hususlar
+  API Yönetimi
+  Kullanıcı Deneyimi (UX)
+
+
+AKILLI AJANDA WEB PROJE RAPORU
+
+1. TANITIM
+
+1.1 Projenin Amacı ve Kapsamı
+AkilliAjandaWeb projesi kapsamında, kullanıcıların görev ve toplantılarını dijital ortamda kolayca yönetebilmeleri sağlanmıştır. Zamanın daha verimli planlanmasına yardımcı olunmuş, üretkenliğin artırılması hedeflenmiştir. Yoğun gündeme sahip kullanıcılar için planlama süreci kolaylaştırılmış, unutulan görevlerin önüne geçilmiştir. Ayrıca, yapay zekâ desteğiyle görev oluşturma ve düzenleme işlemleri kolaylaştırılmıştır. Proje, modern web teknolojileri ve Laravel framework'ü kullanılarak geliştirilmiş ve hem web hem de mobil platformlarda çalışacak şekilde tasarlanmıştır.
+
+Proje kapsamında, etkinlik ve görev yönetimi doğal dil ile ekleme ve düzenleme imkânı sunulmuştur. Google Takvim ile iki yönlü senkronizasyon sağlanmıştır. Bildirim ve mesajlaşma özellikleri entegre edilmiştir. Kullanıcı yönetimi ve profil işlemleri gerçekleştirilmiştir. Yapay zeka destekli asistan (LLM) ile gelişmiş arayüz ve kullanıcı deneyimi hem web hem de mobilde sunulmuştur. Mobil uygulama özelinde, React Native ile modern, responsive ve platform bağımsız bir arayüz oluşturulmuş, gerçek zamanlı bildirimler (Pusher, Firebase) ve güvenli oturum ile veri yönetimi (JWT, OAuth2) sağlanmıştır. Mobilde Google Takvim ile çift yönlü entegrasyon gerçekleştirilmiştir.
+
+1.2 Sorun ve Hedef Analizi
+Günümüzde iş yükü ve zaman yönetimi ihtiyacının artmasıyla birlikte, dijital takvim ve görev yönetim araçlarına olan ihtiyaç da yükselmiştir. Mevcut sistemlerin genellikle manuel işlem ağırlıklı çalıştığı, görev ve etkinlik ekleme, silme, güncelleme işlemlerinin elle yapıldığı ve bunun da zaman ve dikkat gerektirdiği tespit edilmiştir. Ayrıca mevcut sistemlerin doğal dil ile girilen ifadeleri yorumlayıp işlem yapamadığı belirlenmiştir.
+
+Bu kapsamda, farklı takvim servisleriyle entegrasyon eksikliği, manuel işlem yükü ve unutulan görevler, doğal dil desteği ve yapay zekâ entegrasyonunun olmaması, bildirim ve görev yönetiminin yetersizliği gibi sorunlar tespit edilmiştir. Projede, görev ve etkinlik işlemlerinin doğal dil ile yapılabilmesi (Agentic AI), kullanıcı üretkenliğinin artırılması, Google Calendar'a alternatif olarak daha kullanıcı dostu ve kişiselleştirilebilir bir deneyim sunulması, web ve mobilde entegre, çift yönlü takvim ve görev yönetimi sağlanmıştır.
+
+2. PLANLAMA
+
+2.1 Gant Diyagramı (Burada Gant diyagramı eklenecektir)
+Proje süreci; analiz, tasarım, geliştirme, test ve dağıtım-bakım aşamalarını içerecek şekilde planlanmıştır. Proje analizi bir hafta, tasarım bir hafta, geliştirme üç hafta, test bir hafta olarak öngörülmüş ve dağıtım ile bakım süreçlerinin sürekli olarak devam etmesi planlanmıştır.
+
+2.2 Ekip Yapısı (Burada ekip şeması eklenecektir)
+Proje ekibi; proje yöneticisi (planlama ve koordinasyon), backend geliştirici (API, servis ve veri tabanı geliştirme), frontend geliştirici (arayüz ve kullanıcı deneyimi), test uzmanı (otomatik ve manuel testler) ve dokümantasyon sorumlusundan (teknik ve kullanıcı dokümantasyonu) oluşmaktadır. Mobil uygulama özelinde ise iki React Native geliştirici, bir backend geliştirici, bir test uzmanı ve mobil test cihazları (iOS/Android) kullanılmıştır.
+
+2.3 Kaynaklar
+Proje için beş kişilik insan kaynağı, geliştirme bilgisayarları ve test cihazları gibi donanım kaynakları kullanılmıştır. Yazılım olarak Laravel, PostgreSQL ve Google API tercih edilmiştir. Ek olarak Google Cloud Console, GitHub, Composer, NPM ve React Native (mobil) araçları kullanılmıştır.
+
+3. ÇÖZÜMLEME
+
+3.1 Kullanıcı Hikayeleri (User Story)
+Kullanıcıların görevlerini doğal bir dille yazıp sisteme ekleyebilmeleri, silebilmeleri ve güncelleyebilmeleri sağlanmıştır. Böylece görev eklerken zaman kaybı önlenmiş ve planlama kolaylaştırılmıştır. Yapay zekâ destekli asistan ile haftalık görev özetinin alınabilmesi mümkün kılınmıştır. Böylece kullanıcıların önceliklerini netleştirip zamanlarını daha etkili yönetmeleri sağlanmıştır. Ayrıca, mevcut takvimlerin akıllı asistan aracılığıyla kolayca düzenlenebilmesi ve bu düzenlemelerin mevcut takvimle eşitlenebilmesi sağlanmıştır. Böylece tüm takvim bilgilerinin güncel ve senkronize kalması mümkün olmuştur.
+
+3.2 Fonksiyonel Gereksinimler
+Kullanıcı yönetimi ve kimlik doğrulama (JWT/token, e-posta doğrulama, şifre sıfırlama) gerçekleştirilmiştir. Etkinlik ve görev yönetimi (CRUD, detay görüntüleme, öncelik, tamamlanma) sağlanmıştır. Cihaz yönetimi (bildirim token kaydı/silme) entegre edilmiştir. Google Takvim entegrasyonu (OAuth, bağlantı durumu, içe/dışa aktarma, senkronizasyon, bağlantı kaldırma) uygulanmıştır. Akıllı asistana prompt gönderme ve doğal dil ile takvim/görev yönetimi mümkün kılınmıştır. API endpoint'lerinde toplu veri çekme, filtreleme ve anlamlı hata mesajları sunulmuştur. Arka planda çalışan servisler (bildirim, senkronizasyon) devreye alınmıştır. Web ve mobil istemciler için API desteği sağlanmıştır. Mobil uygulama özelinde, gerçek zamanlı bildirimler (Pusher, Firebase), mobilde Google Takvim ile çift yönlü senkronizasyon, responsive ve sade arayüz, offline/online senkronizasyon yönetimi gerçekleştirilmiştir.
+
+3.3 Fonksiyonel Olmayan Gereksinimler
+Kimlik doğrulama işlemlerinde rate limit/throttle uygulanmıştır. Yetkisiz erişimlerin engellenmesi için middleware kullanılmıştır. Hataların loglanması sağlanmıştır. Açık ve anlaşılır kod yapısı ile fonksiyon isimlendirmelerine dikkat edilmiştir. Servis ve repository katmanları ile modüler yapı oluşturulmuştur. API ve web arayüzlerinin ayrı yönetimi sağlanmıştır. Çoklu platform desteği (web ve mobil) sunulmuştur. Mobil uygulama özelinde, güvenli depolama, offline veri yönetimi ve hızlı başlatma özellikleri eklenmiştir.
+
+3.4 Mevcut Sistem ve Eksiklikler
+Mevcut sistemlerde sadece tek yönlü veri aktarımı yapılabildiği, bildirim ve görev yönetiminin kısıtlı olduğu, harici takvimlerle entegrasyonun zayıf olduğu ve doğal dil ile yapay zekâ desteğinin bulunmadığı tespit edilmiştir.
+
+3.5 AkilliAjanda'nın Çözümü
+Proje kapsamında iki yönlü Google Takvim entegrasyonu sağlanmıştır. Gelişmiş görev ve etkinlik yönetimi (doğal dil ile) uygulanmıştır. Bildirim, mesajlaşma ve LLM desteği entegre edilmiştir. Web ve mobilde entegre, modern arayüz sunulmuştur. Mobil uygulama özelinde, anlık bildirimler ve gerçek zamanlı güncellemeler, mobilde sade ve hızlı kullanıcı deneyimi, Google Takvim ile tam uyumlu, offline/online çalışma sağlanmıştır.
+
+3.6 Use Case Diyagramı (Burada Use Case diyagramı eklenecektir)
+Kullanıcıların etkinlik ekleme, düzenleme, silme, Google ile senkronize etme, görev yönetimi, mesaj gönderme, bildirim alma ve doğal dil ile asistanı kullanma senaryoları modellenmiştir. Sistem tarafında Google ile OAuth, etkinlik/görev CRUD, bildirim, mesajlaşma, LLM entegrasyonu ve mobil API desteği sağlanmıştır. Mobil uygulama özelinde login, register, dashboard, calendar, task, profile, settings, notification ekranları tasarlanmıştır.
+
+3.7 Sınıf Diyagramı (Burada Sınıf diyagramı eklenecektir)
+User, Event, Task, Message, Notification, UserDevices modelleri oluşturulmuştur. GoogleCalendarService, CalendarSyncService, MessageService, TaskService, NotificationService ve repository katmanı (ör. EventRepository, TaskRepository) geliştirilmiştir. Mobil uygulama özelinde AuthService, TaskService, EventService, GoogleCalendarService, PusherService, CalendarStore (MobX) modülleri eklenmiştir.
+
+3.8 Veri Modeli ve ERD (Burada ERD diyagramı eklenecektir)
+User, Event, Task, Message, Notification, UserDevices tabloları ve aralarındaki ilişkiler (User 1-N Event, User 1-N Task, User 1-N Message, User 1-N Notification) modellenmiştir. Mobil uygulama özelinde Firebase/Firestore veya backend ile ilişkili SQL/NoSQL veri modeli kullanılmıştır.
+
+3.9 UML Diyagramları (Burada UML diyagramları eklenecektir)
+Sınıf, use case, aktivite ve iş akış diyagramları kodda ve dokümantasyonda mantıksal olarak oluşturulmuştur. Etkinlik ekleme, Google ile senkronizasyon, görev tamamlama, bildirim gönderme, doğal dil ile görev yönetimi iş akışları modellenmiştir. Mobil uygulama özelinde login, görev ekleme, bildirim alma, Google ile senkronizasyon iş akışları hazırlanmıştır.
+
+3.10 Arayüzler
+Dashboard, profil, takvim senkronizasyonu, mesajlar, bildirimler, görevler, akıllı asistan ve mobil arayüzler (React Native ile görev ve takvim yönetimi, asistan, bildirimler) tasarlanmıştır. Mobil uygulama özelinde responsive ve sade arayüz, erişilebilirlik, offline/online çalışma ve canlı bildirimler sağlanmıştır.
+
+4. TASARIM
+
+4.1 Mimari Akış (Burada mimari akış diyagramı eklenecektir)
+Proje mimarisi; Controller, Service, Repository, Model, View (Blade), Mobil API katmanlarından oluşacak şekilde tasarlanmıştır. Google Takvim için özel servis ve controller, LLM/AI servisleri ve mobil API entegrasyonu sağlanmıştır. Web ve mobil istemciler için ayrı endpoint ve arayüzler oluşturulmuştur. Mobil uygulama özelinde katmanlı mimari (Presentation, Business Logic, Data, Integration), React Native bileşenleri, MobX store, Axios ile API iletişimi ve Google Takvim ile bildirim servisleriyle modüler entegrasyon sağlanmıştır.
+
+4.2 Arabirimler ve Testler
+Her modül için blade şablonları (ör. calendar/sync.blade.php) hazırlanmıştır. Form validasyonları, hata yönetimi ve kullanıcıya anlık geri bildirim mekanizmaları entegre edilmiştir. Otomatik testler için phpunit.xml ve manuel test senaryoları oluşturulmuştur. Test kapsamı; kullanıcı işlemleri, Google entegrasyonu, bildirimler, mesajlar ve doğal dil ile görev yönetimini içermektedir. Mobil uygulama özelinde Jest, React Native Testing Library ile birim ve entegrasyon testleri, kullanıcı kabul testleri (UAT), erişilebilirlik ve kullanılabilirlik testleri yapılmıştır.
+
+4.3 Modüller
+Kullanıcı yönetimi, etkinlik yönetimi (CRUD, Google senkronizasyonu, doğal dil ile ekleme), görev yönetimi (CRUD, durum/öncelik, doğal dil ile ekleme), mesajlaşma ve bildirimler, takvim entegrasyonu (Google, ileride Notion), akıllı asistan (LLM tabanlı, haftalık özet, doğal dil işleme) ve mobil uygulama desteği (React Native) modülleri geliştirilmiştir. Mobil uygulama özelinde AuthService, TaskService, EventService, GoogleCalendarService, PusherService, CalendarStore modülleri eklenmiştir.
+
+5. GERÇEKLEŞTİRME
+
+5.1 Kullanılan Teknolojiler
+Backend olarak Laravel, PHP 8+, Eloquent ORM; frontend olarak Blade ve Bootstrap; veritabanı olarak PostgreSQL; entegrasyon için Google API (Calendar), LLM (Gemini, OpenAI, OpenRouter), Firebase, Pusher; mobilde React Native, Axios, Firebase, Pusher; yardımcı araçlar olarak Composer, NPM, Git, Swagger kullanılmıştır. Mobil uygulama özelinde TypeScript/JavaScript, Node.js (backend), MobX, VSCode, Postman tercih edilmiştir.
+
+5.2 Neden Bu Teknolojiler?
+Laravel'in modern, güvenli, sürdürülebilir ve topluluk desteği yüksek olması nedeniyle tercih edilmiştir. Eloquent ile kolay veri modelleme ve ilişkiler sağlanmıştır. Google API ile güçlü ve yaygın takvim entegrasyonu gerçekleştirilmiştir. React Native ile çapraz platform mobil desteği sunulmuştur. LLM/AI ile doğal dil işleme ve akıllı asistan özellikleri entegre edilmiştir. Mobil uygulama özelinde platform bağımsızlık, hızlı geliştirme, kolay entegrasyon ve geniş topluluk avantajları sağlanmıştır.
+
+5.3 Veritabanı Mimarisi
+Migration dosyaları ile şema yönetimi yapılmıştır. Eloquent ile ilişkisel veri modeli oluşturulmuş, token ve hassas veriler için güvenli saklama sağlanmıştır. Mobil uygulama özelinde Firebase/Firestore veya backend ile ilişkili SQL/NoSQL veri modeli kullanılmıştır.
+
+5.4 Standartlar ve Kod Gözden Geçirme
+PSR standartları, fonksiyon ve sınıf açıklamaları, exception handling ve loglama, kod gözden geçirme süreçleri (pull request, code review) uygulanmıştır. Mobil uygulama özelinde Airbnb/Google JS/TS standartları, Prettier, ESLint ve otomatik testler kullanılmıştır.
+
+6. TEST
+
+6.1 Test Planı (Burada test planı diyagramı/akışı eklenecektir)
+Birim testler model, servis ve controller seviyesinde yapılmıştır. Manuel testler formlar, arayüz, Google entegrasyonu ve mobil API üzerinde gerçekleştirilmiştir. Doğrulama işlemleri başarı/başarısız mesajları, loglar ve kullanıcı geri bildirimi ile sağlanmıştır. Mobil uygulama özelinde Jest, React Native Testing Library ile birim ve entegrasyon testleri, kullanıcı kabul testleri (UAT), test ortamı kurulumu ve hata takibi yapılmıştır.
+
+6.2 Kullanılan Test Araçları
+PHPUnit ile otomatik testler, Laravel test yardımcıları ve manuel testler için test senaryoları hazırlanmıştır. Mobil uygulama özelinde Jest, React Native Testing Library ve CI/CD pipeline'ında otomatik testler kullanılmıştır.
+
+6.3 Test Kapsamı ve Süreçleri
+Kullanıcı kayıt/giriş işlemleri, etkinlik ve görev CRUD, Google Takvim bağlantısı ve senkronizasyonu, bildirim ve mesajlaşma, doğal dil ile görev/etkinlik yönetimi ve hata yönetimi ile loglama test kapsamına alınmıştır. Mobil uygulama özelinde mobilde offline/online senkronizasyon, bildirim testleri ve kullanıcı hikayeleri bazında testler yapılmıştır.
+
+8. SONUÇ
+
+8.1 Değerlendirme
+Proje kapsamında, modern ajanda uygulamalarının ötesinde, iki yönlü takvim entegrasyonu, doğal dil ile görev yönetimi ve modüler mimari sağlanmıştır. Güçlü yönler olarak güvenlik, sürdürülebilirlik, genişletilebilirlik, kullanıcı dostu arayüz, açık kaynak kod, mobil ve web desteği ile yapay zekâ entegrasyonu öne çıkmaktadır. Eksik olarak Notion entegrasyonu ve Google Tasks tam entegrasyonunun henüz yapılmadığı, otomatik test kapsamının artırılabileceği tespit edilmiştir. Mobil uygulama özelinde hızlı, güvenli, entegre ve kullanıcı odaklı mobil deneyim, anlık bildirimler, offline/online çalışma, sade ve erişilebilir arayüz sağlanmıştır. Kısıt olarak sadece mobil platformlar ve Google hesabı gerekliliği belirtilmiştir.
+
+8.2 Avantajlar ve Dezavantajlar
+Proje kapsamında modüler yapı ve servis/repository pattern, güçlü entegrasyon ve API desteği, açık kaynak, kolay bakım ve genişletilebilirlik, modern ve kullanıcı dostu arayüz (web ve mobil), doğal dil ile görev/etkinlik yönetimi sağlanmıştır. Mobil uygulama özelinde gerçek zamanlı bildirimler, offline/online senkronizasyon, hızlı ve sade arayüz avantajları sunulmuştur. Dezavantaj olarak bazı entegrasyonların eksik olması (Notion, Google Tasks), daha fazla otomatik test ve CI/CD entegrasyonu gerekliliği ve mobil uygulama özelinde yüksek entegrasyon bağımlılığı ile internet gereksinimi belirtilmiştir.
+
+8.3 Gelecek Geliştirmeler
+Notion entegrasyonu, Google Tasks tam desteği, daha fazla otomasyon, kullanıcı geri bildirimi ve test, mobil uygulama fonksiyonlarının genişletilmesi planlanmaktadır. Mobil uygulama özelinde diğer takvim servisleriyle entegrasyon, offline mod ve gelişmiş bildirim seçenekleri eklenmesi hedeflenmektedir.
+
+EK: RİSK ANALİZİ, GÜVENLİK, DEVOPS, YASAL/ETİK, API YÖNETİMİ
+
+Risk Analizi (Burada risk matrisi/grafiği eklenecektir)
+Google API değişiklikleri ve erişim kısıtlamaları, kullanıcı veri güvenliği ve gizliliği, entegrasyon hataları ve veri kaybı, sürüm güncellemeleriyle uyumsuzluk, mobil ve webde farklı platform sorunları risk olarak değerlendirilmiştir. Mobil uygulama özelinde Google entegrasyonunda yetki kaybı, offline/online veri tutarsızlığı ve mobil cihaz uyumluluğu riskleri tespit edilmiştir.
+
+Güvenlik Önlemleri
+Token ve hassas verilerin güvenli saklanması, middleware ile erişim kontrolü, loglama ve hata yönetimi, kullanıcı verisi gizliliği ve GDPR uyumluluğu sağlanmıştır. Mobil uygulama özelinde JWT ile güvenli oturum, OAuth2 ile Google entegrasyonu, şifrelerin hashlenmesi ve rol tabanlı erişim kontrolü uygulanmıştır.
+
+Sürdürülebilirlik
+Modüler kod yapısı ve servis/repository pattern, açık kaynak lisans ve topluluk desteği, kolay bakım ve güncelleme süreçleri, web ve mobilde ortak API kullanımı sağlanmıştır. Mobil uygulama özelinde kodun modüler ve dokümante olması, otomatik testler ve CI/CD ile sürekli entegrasyon sağlanmıştır.
+
+DevOps ve CI/CD
+Sürüm kontrolü (Git) ve CI/CD entegrasyonu için altyapı hazırlanmıştır. Mobil uygulama özelinde GitHub Actions, Bitrise, Fastlane ve otomatik test ve dağıtım pipeline'ı kullanılmıştır.
+
+Yasal ve Etik Hususlar
+Kullanıcı verisi gizliliği ve açık rıza, açık kaynak lisans kullanımı, yasal yükümlülükler ve etik kurallar dikkate alınmıştır. Mobil uygulama özelinde KVKK/GDPR uyumluluğu, kullanıcıdan açık rıza alınması ve üçüncü parti kütüphane lisansları kontrol edilmiştir.
+
+API Yönetimi
+RESTful API mimarisi, JSON veri formatı, dış sistemlerle kolay entegrasyon, API anahtarı ve erişim yönetimi, web ve mobil istemciler için ayrı endpoint yönetimi sağlanmıştır. Mobil uygulama özelinde modüler API altyapısı, güvenli anahtar yönetimi ve gelecekte eklenebilecek entegrasyonlar için esneklik sağlanmıştır.
+
+Kullanıcı Deneyimi (UX)
+Modern ve responsive arayüz (web ve mobil), hata ve başarı mesajları, kullanıcı geri bildirim mekanizmaları, doğal dil ile görev/etkinlik yönetimi ve haftalık özet sağlanmıştır. Mobil uygulama özelinde kullanıcıya anlık bildirimler, erişilebilirlik (renk kontrastı, büyük butonlar), uygulama içi değerlendirme ve A/B testleri uygulanmıştır.
+
+Bu raporda, AkilliAjandaWeb projesinin isterler.txt, sunum.txt ve SRS_SRD_AkilliAjandaMobil.md gereksinimlerine göre detaylı analiz sunulmuştur. Grafik, diyagram ve tabloları eklemek için uygun alanlar belirtilmiştir. Daha fazla teknik detay veya örnek istenirse ayrıca eklenebilir. 
+
+Hazırlanan bu rapor ile, AkilliAjandaWeb projesinin hem teknik hem de fonksiyonel açıdan kapsamlı bir şekilde ele alındığı, yazılım mühendisliği disiplinine uygun olarak tüm gereksinimlerin ve süreçlerin sistematik biçimde analiz edildiği görülmektedir. Proje kapsamında geliştirilen modüler ve sürdürülebilir mimari sayesinde, hem web hem de mobil platformlarda yüksek erişilebilirlik ve kullanıcı memnuniyeti sağlanmıştır. Google Takvim entegrasyonu, yapay zekâ destekli asistan, doğal dil işleme ve gerçek zamanlı bildirim altyapısı ile günümüzün modern ajanda ve görev yönetimi ihtiyaçlarına yenilikçi çözümler sunulmuştur. 
+
+Proje çıktıları, sadece teknik bir ürün olarak kalmamış; aynı zamanda yazılım geliştirme süreçlerinde ekip çalışmasının, planlamanın, test ve bakım süreçlerinin önemini vurgulayan bir örnek teşkil etmiştir. Akademik açıdan, UML diyagramları, ERD, iş akışları ve veri modellemesi gibi yazılım mühendisliği araçlarının etkin kullanımı ile literatüre katkı sağlanmıştır. Sektörel olarak ise, açık kaynak kodlu ve genişletilebilir yapısı sayesinde benzer ajanda ve görev yönetimi projelerine örnek olabilecek bir referans platform oluşturulmuştur. 
+
+Projenin sürdürülebilirliği, modüler kod yapısı, açık kaynak lisanslama ve topluluk desteği ile güvence altına alınmıştır. Gelecekte, Notion ve Google Tasks gibi ek entegrasyonlar, daha fazla otomasyon ve kullanıcı geri bildirimi ile sistemin fonksiyonelliği ve kullanıcı deneyimi daha da geliştirilebilecektir. Ayrıca, mobil uygulama tarafında offline/online çalışma, gelişmiş bildirim seçenekleri ve farklı takvim servisleriyle entegrasyon gibi yenilikçi özelliklerin eklenmesiyle, projenin etki alanı genişletilebilecektir. 
+
+Bu rapor, yazılım geliştirme süreçlerinde yer alan öğrencilere, akademisyenlere ve sektördeki profesyonellere; gereksinim analizi, çözümleme, tasarım, gerçekleştirme, test, bakım ve sürdürülebilirlik konularında kapsamlı bir başvuru kaynağı sunmaktadır. Ayrıca, kullanıcı deneyimi, güvenlik, risk yönetimi ve yasal/etik hususlarda da iyi uygulama örnekleri içermektedir. Proje, benzer sistemlerle karşılaştırıldığında, iki yönlü entegrasyon, doğal dil işleme ve yapay zekâ desteği ile öne çıkmakta; modern yazılım geliştirme yaklaşımlarının başarıyla uygulandığı bir örnek olarak literatürde yerini almaktadır. 

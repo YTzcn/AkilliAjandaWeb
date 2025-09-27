@@ -1,0 +1,546 @@
+ONLINE AJANDA VE GÖREV PLANLAYICI
+Akıllı Ajanda
+
+Akıllı Ajanda
+PROJENIN
+AMACI
+Kullanıcıların görev ve toplantılarını dijital ortamda
+kolayca yönetebilmesini sağlamak
+Zamanı daha verimli planlayabilmelerine yardımcı olmak
+Üretkenliği artırmak
+Yoğun gündeme sahip kullanıcılar için planlama sürecini
+kolaylaştırmak
+Unutulan görevlerin önüne geçmek
+Yapay zekâ desteği ile:
+Görev oluşturma ve düzenlemeyi kolaylaştırmak
+Kullanıcı dostu bir deneyim sunmak
+Projenin Amacı
+SORUN ANALIZI
+Günümüzde iş yükü ve zaman yönetimi ihtiyacı birlikte artıyor.
+Bu artış, dijital takvim ve görev yönetim araçlarına olan ihtiyacı da
+artırıyor.
+Ancak mevcut sistemler genellikle manuel işlem ağırlıklı çalışıyor.
+Örneğin Google Takvim’de:
+Görev/etkinlik ekleme, silme, güncelleme işlemleri elle yapılıyor.
+Bu da fazladan zaman ve dikkat gerektiriyor.
+Yoğun programlarda unutmalar ve gecikmeler yaşanabiliyor.
+Ek olarak:
+Bu sistemler, görevlerin anlamını ve bağlamını anlayamıyor.
+Doğal dil ile girilen ifadeleri yorumlayıp işlem yapamıyorlar.
+Yani yapay zekâ desteği yetersiz veya hiç yok.
+.
+HEDEF ANALIZI
+• 1. Manuel İşlem Yükünü Azaltmak:
+• Görev oluşturma, silme, güncelleme gibi işlemleri doğal dil ile yapma imkânı
+sunulacak.
+• Böylece kullanıcılar manuel işlemle zaman kaybetmeyecek.
+• 2. Yapay Zekâ ile Etkileşim:
+• Agentic AI kullanılarak doğal dili anlayan ve görevleri bağlama göre
+ayırabilen bir sistem geliştirilecek.
+• 3. Kullanıcı Üretkenliğini Artırmak:
+• Zamanı daha verimli kullanmayı sağlayarak, görev ve etkinliklerin düzenli
+takibini kolaylaştırmak hedefleniyor.
+• 4. Google Calendar’a Alternatif:
+• Mevcut takvim sistemlerine göre daha kullanıcı dostu, esnek ve
+kişiselleştirilebilir bir planlama deneyimi sunulacak.
+Akıllı Ajanda Hedef Sorun Analizi
+Akıllı Ajanda Sistemin Geliştirilmesinde Kullanılan Teknolojiler
+Web:
+PHP 8.2: Uygulamanın ana backend dili.
+Laravel 12: PHP framework’ü, uygulamanın temelini oluşturuyor.
+Laravel Sanctum: API authentication için kullanılıyor.
+Laravel Tinker: Konsol üzerinden uygulama ile etkileşim için.
+Google Gemini PHP Laravel: Google Gemini API entegrasyonu için.
+Google API Client ve Google Cloud: Google servisleriyle entegrasyon için.
+Pusher PHP Server: Gerçek zamanlı bildirimler ve gerçek zamanlı takvim tetiklemeleri için
+Swagger: API dokümantasyonu için.
+Laravel Breeze: Basit auth starter kit.
+Firebase: Bildirimler
+Mobil:
+React Native (JavaScript/TypeScript ile)
+React Navigation (navigasyon için)
+Axios (API istekleri için)
+Firebase
+Pusher
+Genel Fonksiyonlar:
+Görev Yönetimi:
+Görev ekleme, çıkarma, düzenleme, önceliklendirme, tamamlama takibi
+Takvim & Senkronizasyon:
+Google Calendar ile çift yönlü entegrasyon
+Hatırlatmalar & Bildirimler:
+Zaman bazlı ve tekrar eden uyarılar
+Yapay Zekâ Asistanı (LLM):
+Doğal dil ile görev ekleme, silme, özetleme ve güncelleme
+Web Uygulaması:
+Laravel Blade tabanlı kullanıcı arayüzü
+Görev yönetimi ve takvim görüntüleme
+Google Calendar entegrasyonu
+Yapay zekâ ile görev işlemleri
+Mobil Uygulama:
+React Native ile çapraz platform desteği
+Görev oluşturma, düzenleme, tamamlama, önceliklendirme
+Mobil takvim görünümü ve entegrasyon
+Zaman bazlı bildirimler
+Yapay zekâ destekli görev yönetim
+Akıllı Ajanda Proje kapsamı
+Akıllı Ajanda User Story
+1.Görevlerimi doğal bir dille yazıp sisteme eklemek silmek güncellemek
+istiyorum,böylece görev eklerken zaman kaybetmeden kolayca planlama
+yapabilirim.
+2.Yapay zekâ destekli asistanı kullanarak haftalık görev özetimi almak
+istiyorum,böylece önceliklerimi netleştirip zamanımı daha etkili
+yönetebilirim.
+3.Bir kullanıcı olarak, mevcut takvimimi akıllı asistan aracılığıyla kolayca
+düzenleyebilmek ve bu düzenlemeleri mevcut takvimimle eşitleyebilmek
+istiyorum, böylece tüm takvim bilgilerim güncel ve senkronize kalabilsin.
+Akıllı Ajanda Fonksiyonel Ve Fonksiyonel Olmayan Gereksinimler
+1.Kullanıcı Yönetimi ve Kimlik Doğrulama
+2.Kullanıcı kaydı
+3.E-posta doğrulama (kod ile)
+4.Kullanıcı Giriş/çıkış
+5.Şifre sıfırlama ve değiştirme
+6.Kullanıcı profil yönetimi
+7.JWT veya benzeri token ile kimlik doğrulama
+8.EtkinlikYönetimi
+9.Etkinlik oluşturma, listeleme, güncelleme, silme
+10.Etkinlik detaylarını görüntüleme
+11.Görev Yönetimi
+12.Görev oluşturma, listeleme, güncelleme, silme
+13.Görev tamamlama/pasif yapma
+14.Görev detaylarını görüntüleme
+15.Cihaz Yönetimi
+16.Cihaz token kaydı ve silinmesi (bildirim için)
+17.Google Takvim Entegrasyonu
+18.Google ile bağlantı durumu kontrolü
+19.Google OAuth ile yetkilendirme ve bağlantı
+20.Google Takvim etkinliklerini listeleme, içe/dışa aktarma, senkronizasyon
+21.Google Takvim bağlantısını kaldırma
+22.Akıllı asistana prompt gönderme
+23.Akıllı asistan aracılığıyla takvimi yönetebilme
+Fonksiyonel Gereksinimler
+1.Kimlik doğrulama (token bazlı, middleware ile koruma)
+2.E-posta doğrulama ve şifre sıfırlama işlemlerinde rate limit/throttle
+3.Yetkisiz erişimlerin engellenmesi
+4.Hatalı isteklerde anlamlı hata mesajları
+5.API endpoint’lerinde toplu veri çekme ve filtreleme desteği
+6.Arka planda çalışan servisler (ör. bildirim, senkronizasyon)
+7.Hatalı işlemlerde kullanıcıya açıklayıcı hata mesajları
+8.Başarılı işlemlerde bilgilendirici geri dönüşler
+9.Google Takvim API’si ile tam entegre çalışma
+10.LLM/AI servisleriyle esnek sağlayıcı desteği
+11.Bakım ve Genişletilebilirlik
+12.Servis ve repository katmanları ile modüler yapı
+13.API ve web arayüzlerinin ayrı yönetimi
+14.Açık ve anlaşılır kod yapısı, fonksiyon isimlendirmeleri
+15.Hataların loglanması
+16.Çoklu Platform Desteği
+17.Web ve mobil istemciler için API desteği
+Fonksiyonel Olmayan Gereksinimler
+Akıllı Ajanda Web Arayüzlerinin Tanıtılması
+A
+k
+ı
+l
+l
+ı
+Aj
+a
+n
+d
+a
+A
+kıllıA
+j
+a
+n
+d
+a
+K
+o
+n
+t
+r
+ol P
+a
+n
+eli Ö
+z
+ellikle
+ri Tüm etkinlik ve görevler, tek ekra
+n
+d
+a
+n
+y
+ö
+n
+e
+tile
+bilir. Aylık / haftalık
+t
+a
+k
+vim
+g
+ö
+r
+ü
+n
+ü
+m
+ü ile
+pla
+nla
+r
+n
+e
+t
+ş
+e
+kild
+e
+g
+ö
+r
+ü
+n
+t
+üle
+nir. “Bugün” butonu ile a
+nın
+d
+a
+g
+ü
+n
+c
+el t
+a
+rih
+e
+g
+e
+çiş
+y
+a
+pıla
+bilir. Sohbet bu
+t
+o
+n
+u ile
+y
+a
+p
+a
+y
+z
+e
+k
+â
+d
+e
+s
+t
+e
+kli A
+kıllı Asistana ulaşılır. Asistan sayesinde görev ve takvim yönetimi doğal dil ile zahmetsizce yapılabilir. Yaklaşan etkinlikler ve bekleyen görevler sağ panelde listelenir. Renkli öncelik etiketleri ile görevler kolayca ayır
+t
+e
+dilir. Görev
+v
+e
+e
+t
+kinlik
+d
+e
+t
+a
+yla
+rı,
+t
+e
+k
+b
+a
+kış
+t
+a
+g
+ö
+r
+ü
+n
+t
+üle
+n
+e
+r
+e
+k
+v
+e
+rimlilik
+a
+r
+tırılır. Web Arayüzlerinin Tanıtılması
+A
+k
+ı
+l
+l
+ı
+Aj
+a
+n
+d
+a
+W
+e
+b
+A
+r
+a
+y
+ü
+zle
+rinin
+T
+a
+nıtılm
+a
+sı A
+kıllı A
+sis
+t
+a
+n
+M
+o
+d
+ülü
+(
+L
+L
+M
+T
+a
+b
+a
+nlı)
+Y
+a
+p
+a
+y
+z
+e
+k
+â
+d
+e
+s
+t
+e
+kli A
+kıllı A
+sis
+t
+a
+n
+,
+L
+L
+M
+t
+e
+k
+n
+olo
+jisi ile çalışır. Kullanıcının yazdığı serbest metinleri analiz eder. Doğal ifadeleri anlayarak otomatik görev oluşturabilir. Örn: “Sunum için slayt hazırlamam çok önemli” → Görev olarak eklenir. Manuel giriş ihtiyacını azaltır, kullanıcı deneyimini kolaylaştırır. Haftalık Özet Özelliği Asistan, kullanıcının isteği üzerine haftalık etkinlik özetini sunar. Özet; günlük bazda sıralanır ve görev/etkinlik bilgilerini içerir. Kullanıcının zaman yönetimi ve öncelik belirlemesi kolaylaşır. Görselde, bu özetin sohbet arayüzü üzerinden sağlandığı görülmektedir.
+A
+k
+ı
+l
+l
+ı
+Aj
+a
+n
+d
+a
+1
+8
+j
+u
+n
+e
+2
+0
+2
+7
+P
+r
+o
+fil S
+a
+y
+f
+a
+sı Ö
+z
+ellikle
+ri Kullanıcı bilgileri (a
+d
+,
+e
+-
+p
+o
+s
+t
+a
+)
+g
+ö
+r
+ü
+n
+t
+üle
+n
+e
+bilir
+v
+e
+g
+ü
+n
+c
+elle
+n
+e
+bilir. Şifre değiştirme alanı yer alır (mev
+c
+u
+t
+şif
+r
+e
+girile
+r
+e
+k
+y
+e
+ni şif
+r
+e
+b
+elirle
+nir
+). Hesap güvenliği bu sayede kolay
+c
+a
+s
+a
+ğla
+nır. Google Takvim
+E
+n
+t
+e
+g
+r
+a
+s
+y
+o
+n
+u
+K
+ulla
+nıcı,
+h
+e
+s
+a
+bını b
+a
+ğla
+y
+a
+r
+a
+k
+t
+a
+k
+vim
+s
+e
+n
+k
+r
+o
+niz
+a
+s
+y
+o
+n
+u
+y
+a
+p
+a
+bilir. Google Takvim ile etkinlikle
+rin
+e
+ş
+z
+a
+m
+a
+nlı yönetimi sağlanır. Hesap Silme ve Hızlı Bilgi Paneli Sayfanın en altında hesabı kalıcı silme seçeneği bulunur. Sağ panelde: Hesap özeti Etkinlik ve görev bilgileri Hızlı erişim bağlantıları yer alır. Web Arayüzlerinin Tanıtılması
+Akıllı Ajanda Web Arayüzlerinin Tanıtılması
+Takvim Senkronizasyonu Sayfası
+Google Takvim bağlantı durumu üst kısımda
+gösterilir.
+Bağlantı varsa: “Başarıyla bağlandı” mesajı
+yer alır.
+Kullanıcı, isterse bu bağlantıyı iptal edebilir.
+İşlem Seçenekleri
+1.Etkinlikleri Google Takvim’e Aktar
+Uygulamadaki etkinlikler dışa aktarılır.
+Google Takvim güncellenir.
+2.Google Takvim’den Etkinlikleri İçe Aktar
+Belirli tarih aralığı seçilir.
+Google Takvim’den veriler içe alınır.
+Avantajlar
+Çift yönlü senkronizasyon yapılabilir.
+Kullanıcı, farklı platformlar arasında takvim
+yönetimini kolaylaştırır.
+Akıllı Ajanda Mobil Arayüzlerinin Tanıtımı
+Akıllı Ajanda Mobil Arayüzlerinin Tanıtımı
+Akıllı Ajanda Mobil Arayüzlerinin Tanıtımı
+Akıllı Ajanda Mobil Arayüzlerinin Tanıtımı
+Mobil Arayüz – Akıllı Asistan Özeti
+Bu görselde, mobil uygulamada çalışan Akıllı Asistan modülü
+gösterilmiştir.
+Kullanıcı,
+“Bana haftamı özetle” yazarak haftalık özet istemiştir.
+Asistanın Verdiği Yanıt
+Yapay zekâ, 12–18 Mayıs 2025 tarihleri arasındaki:
+Önemli etkinlikleri
+Görevleri
+analiz ederek listelemiştir.
+Bilgiler, iki başlık altında sunulmuştur:
+Etkinlikler
+Görevler
+Her madde, tarih ve öncelik düzeyleriyle birlikte gösterilmiştir.
+Kullanıcıya Sağladığı Faydalar
+Mobil ortamda zamandan tasarruf sağlar.
+Görev ve zaman yönetimini pratik ve etkili hâle getirir.
+Sohbet arayüzü üzerinden etkileşim, kullanıcı deneyimini artırır.
