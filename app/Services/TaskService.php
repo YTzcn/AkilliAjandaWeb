@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Task;
 use App\Repositories\TaskRepository;
+use App\Support\TaskListFilterNormalizer;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,9 @@ class TaskService
      */
     public function getFilteredTasks(array $filters): Collection
     {
-        return $this->taskRepository->filteredForUser(Auth::id(), $filters);
+        $normalized = TaskListFilterNormalizer::normalize($filters);
+
+        return $this->taskRepository->filteredForUser(Auth::id(), $normalized);
     }
 
     /**
