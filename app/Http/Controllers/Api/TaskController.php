@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CalendarTaskRequest;
 use App\Http\Requests\Api\TaskRequest;
+use App\Http\Requests\IndexTaskFiltersRequest;
 use App\Models\Task;
 use App\Services\TaskService;
 use Carbon\Carbon;
@@ -75,17 +76,10 @@ class TaskController extends Controller
                 'end' => $request->input('end'),
             ]);
         } else {
-            $filters = $request->only([
-                'status', 'priority', 'is_completed', 'due_from', 'due_to',
-                'category_id', 'sort', 'dir',
-            ]);
-            $filters = array_filter(
-                $filters,
-                static fn ($v) => $v !== null && $v !== ''
+            $validated = $request->validate(
+                IndexTaskFiltersRequest::rulesForQuery($request->user()?->id)
             );
-            $tasks = $filters === []
-                ? $this->service->getAllTasks()
-                : $this->service->getFilteredTasks($filters);
+            $tasks = $this->service->getFilteredTasks($validated);
         }
 
         return response()->json($tasks);

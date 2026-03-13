@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IndexTaskFiltersRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Support\TaskListFilterNormalizer;
 use App\Services\CategoryService;
 use App\Services\TaskService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class TaskController extends Controller
@@ -25,13 +26,23 @@ class TaskController extends Controller
      *
      * @return View
      */
-    public function index(Request $request): View
+    public function index(IndexTaskFiltersRequest $request): View
     {
-        $filters = $request->only([
-            'status', 'priority', 'is_completed', 'due_from', 'due_to',
-            'category_id', 'sort', 'dir',
-        ]);
-        $tasks = $this->taskService->getFilteredTasks($filters);
+        $validated = $request->validated();
+        $tasks = $this->taskService->getFilteredTasks($validated);
+        $normalized = TaskListFilterNormalizer::normalize($validated);
+        $filters = [
+            'status' => $validated['status'] ?? '',
+            'priority' => array_key_exists('priority', $validated) && $validated['priority'] !== ''
+                ? (string) $validated['priority'] : '',
+            'is_completed' => array_key_exists('is_completed', $validated) ? (string) $validated['is_completed'] : '',
+            'due_from' => $validated['due_from'] ?? '',
+            'due_to' => $validated['due_to'] ?? '',
+            'due_date' => $validated['due_date'] ?? '',
+            'category_id' => isset($validated['category_id']) ? (string) $validated['category_id'] : '',
+            'sort' => $normalized['sort'],
+            'dir' => $normalized['dir'],
+        ];
         $categories = $this->categoryService->listForUser();
 
         return view('tasks.index', compact('tasks', 'categories', 'filters'));
