@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('scripts')
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -15,8 +19,15 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            <form method="get" action="{{ route('tasks.index') }}" class="row g-3 align-items-end">
-                <div class="col-md-2">
+            <form
+                method="get"
+                action="{{ route('tasks.index') }}"
+                class="row g-3 align-items-end"
+                x-data
+                x-ref="taskFilterForm"
+                @change="if ($event.target.closest('[data-auto-submit]')) { $refs.taskFilterForm.requestSubmit(); }"
+            >
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Durum</label>
                     <select name="status" class="form-select form-select-sm">
                         <option value="">Tümü</option>
@@ -25,7 +36,7 @@
                         <option value="completed" @selected(($filters['status'] ?? '') === 'completed')>Tamamlandı</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Öncelik</label>
                     <select name="priority" class="form-select form-select-sm">
                         <option value="">Tümü</option>
@@ -34,7 +45,7 @@
                         <option value="3" @selected(($filters['priority'] ?? '') == '3')>Yüksek</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Tamamlandı</label>
                     <select name="is_completed" class="form-select form-select-sm">
                         <option value="">Tümü</option>
@@ -42,7 +53,7 @@
                         <option value="1" @selected(($filters['is_completed'] ?? '') === '1' || ($filters['is_completed'] ?? '') === true)>Evet</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Kategori</label>
                     <select name="category_id" class="form-select form-select-sm">
                         <option value="">Tümü</option>
@@ -51,15 +62,19 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" data-auto-submit>
+                    <label class="form-label small text-muted">Son tarih (tek gün)</label>
+                    <input type="date" name="due_date" class="form-control form-control-sm" value="{{ $filters['due_date'] ?? '' }}" title="Aralık boşken aynı güne göre filtreler">
+                </div>
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Son tarih (başlangıç)</label>
                     <input type="date" name="due_from" class="form-control form-control-sm" value="{{ $filters['due_from'] ?? '' }}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Son tarih (bitiş)</label>
                     <input type="date" name="due_to" class="form-control form-control-sm" value="{{ $filters['due_to'] ?? '' }}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Sırala</label>
                     <select name="sort" class="form-select form-select-sm">
                         <option value="due_date" @selected(($filters['sort'] ?? 'due_date') === 'due_date')>Son tarih</option>
@@ -68,7 +83,7 @@
                         <option value="title" @selected(($filters['sort'] ?? '') === 'title')>Başlık</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Yön</label>
                     <select name="dir" class="form-select form-select-sm">
                         <option value="asc" @selected(($filters['dir'] ?? 'asc') === 'asc')>Artan</option>
