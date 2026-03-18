@@ -74,6 +74,35 @@ class TaskService
     }
 
     /**
+     * Son tarihi aralıkta olan yüksek öncelikli (varsayılan 3) bekleyen görev sayısı.
+     */
+    public function countHighPriorityPendingDueBetween(
+        \Carbon\Carbon $start,
+        \Carbon\Carbon $end,
+        int $minPriority = 3
+    ): int {
+        return Task::query()
+            ->where('user_id', Auth::id())
+            ->where('is_completed', false)
+            ->where('priority', '>=', $minPriority)
+            ->where('due_date', '>=', $start->copy()->startOfDay())
+            ->where('due_date', '<=', $end->copy()->endOfDay())
+            ->count();
+    }
+
+    /**
+     * Bugüne son tarihli bekleyen görev sayısı.
+     */
+    public function countPendingDueToday(): int
+    {
+        return Task::query()
+            ->where('user_id', Auth::id())
+            ->where('is_completed', false)
+            ->whereDate('due_date', Carbon::today())
+            ->count();
+    }
+
+    /**
      * Get pending tasks for the authenticated user.
      *
      * @return Collection

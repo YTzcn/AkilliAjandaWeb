@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Repositories\EventRepository;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,6 +45,18 @@ class EventService
     public function getEventsForDateRange(string $startDate, string $endDate): Collection
     {
         return $this->eventRepository->getEventsBetweenDates($startDate, $endDate);
+    }
+
+    /**
+     * Hafta penceresiyle çakışan etkinlik sayısı (başlangıç/bitiş aralığı örtüşmesi).
+     */
+    public function countOverlappingRange(Carbon $rangeStart, Carbon $rangeEnd): int
+    {
+        return Event::query()
+            ->where('user_id', Auth::id())
+            ->where('start_date', '<=', $rangeEnd->copy()->endOfDay())
+            ->where('end_date', '>=', $rangeStart->copy()->startOfDay())
+            ->count();
     }
 
     /**
