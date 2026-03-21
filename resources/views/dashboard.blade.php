@@ -461,7 +461,7 @@
         <div>
             <h1 class="h3 mb-0">Hoş Geldiniz, {{ Auth::user()->name }}</h1>
             <p class="text-muted small mb-0 mt-1">
-                Bu hafta ({{ $weekStart->locale('tr')->isoFormat('D MMM') }} – {{ $weekEnd->locale('tr')->isoFormat('D MMM YYYY') }}): etkinlik ve görev özeti aşağıdadır.
+                Bu hafta ({{ $summary->weekStart->locale('tr')->isoFormat('D MMM') }} – {{ $summary->weekEnd->locale('tr')->isoFormat('D MMM YYYY') }}): etkinlik ve görev özeti aşağıdadır.
             </p>
         </div>
         <div class="d-flex align-items-center">
@@ -480,63 +480,90 @@
 
         <!-- Sağ Bölüm -->
         <div class="widgets-container">
-            <!-- İstatistikler -->
+            <!-- İstatistikler: özet kartları ve boş durum metinleri -->
             <div class="mb-4">
                 <div class="row g-3">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card shadow-sm border-0">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
-                                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                        <div class="bg-primary bg-opacity-10 p-3 rounded-3">
                                             <i class="bi bi-calendar-event text-primary fs-4"></i>
                                         </div>
                                     </div>
                                     <div>
-                                        <h6 class="mb-1">Yaklaşan Etkinlikler</h6>
-                                        <h3 class="mb-0">{{ $upcomingEvents->count() }}</h3>
+                                        <h6 class="mb-1 text-secondary">Önümüzdeki 7 gün — etkinlik</h6>
+                                        <h3 class="mb-0">{{ $summary->upcomingEventsCount }}</h3>
+                                        @if($summary->upcomingEventsCount === 0)
+                                            <p class="small text-muted mb-0 mt-1">Yakın tarihte etkinlik yok; takvimden ekleyebilirsiniz.</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card shadow-sm border-0">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
-                                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                        <div class="bg-warning bg-opacity-10 p-3 rounded-3">
                                             <i class="bi bi-check2-square text-warning fs-4"></i>
                                         </div>
                                     </div>
                                     <div>
-                                        <h6 class="mb-1">Bekleyen Görevler</h6>
-                                        <h3 class="mb-0">{{ $pendingTasks->count() }}</h3>
+                                        <h6 class="mb-1 text-secondary">Tüm bekleyen görevler</h6>
+                                        <h3 class="mb-0">{{ $summary->pendingTasksCount }}</h3>
+                                        @if($summary->pendingTasksCount === 0)
+                                            <p class="small text-muted mb-0 mt-1">Bekleyen görev yok.</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-danger">
+                            <div class="card-body">
+                                <h6 class="text-secondary small text-uppercase mb-1">Bu hafta — yüksek öncelik</h6>
+                                <p class="display-6 mb-0">{{ $summary->highPriorityWeekDueCount }}</p>
+                                <p class="small text-muted mb-0 mt-2">Son tarihi bu hafta olan öncelik 3 görevler.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-info">
+                            <div class="card-body">
+                                <h6 class="text-secondary small text-uppercase mb-1">Bugün son tarih</h6>
+                                <p class="display-6 mb-0">{{ $summary->pendingDueTodayCount }}</p>
+                                <p class="small text-muted mb-0 mt-2">Bugüne kadar tamamlanması gereken bekleyen görevler.</p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-12">
-                        <div class="card border-0 bg-light">
+                        <div class="card border-0 bg-light shadow-sm">
                             <div class="card-body py-3">
                                 <h6 class="text-muted text-uppercase small mb-3">Haftalık özet</h6>
+                                @if($summary->weekEventsCount === 0 && $summary->weekPendingDueCount === 0)
+                                    <p class="small text-muted mb-3 mb-md-0">Bu hafta için çakışan etkinlik veya son tarihi bu haftaya düşen bekleyen görev yok.</p>
+                                @endif
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <div class="small text-muted">Bu haftaki etkinlikler</div>
-                                        <div class="fs-4 fw-semibold">{{ $weekEvents->count() }}</div>
+                                        <div class="fs-4 fw-semibold">{{ $summary->weekEventsCount }}</div>
                                     </div>
                                     <div class="col-6">
                                         <div class="small text-muted">Bu hafta son tarihi gelen görevler</div>
-                                        <div class="fs-4 fw-semibold">{{ $weekTasksDue }}</div>
+                                        <div class="fs-4 fw-semibold">{{ $summary->weekPendingDueCount }}</div>
                                     </div>
                                     <div class="col-6">
                                         <div class="small text-muted">Geciken görevler</div>
-                                        <div class="fs-4 fw-semibold text-danger">{{ $overdueCount }}</div>
+                                        <div class="fs-4 fw-semibold text-danger">{{ $summary->overdueCount }}</div>
                                     </div>
                                     <div class="col-6">
                                         <div class="small text-muted">Bu hafta tamamlanan görevler</div>
-                                        <div class="fs-4 fw-semibold text-success">{{ $weekTasksCompleted }}</div>
+                                        <div class="fs-4 fw-semibold text-success">{{ $summary->weekCompletedCount }}</div>
                                     </div>
                                 </div>
                             </div>
