@@ -25,9 +25,13 @@
                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required maxlength="100">
                     @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label">Açıklama (isteğe bağlı)</label>
                     <input type="text" name="description" class="form-control" value="{{ old('description') }}" maxlength="500">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Renk</label>
+                    <input type="color" name="color" class="form-control form-control-color w-100" value="{{ old('color', '#6c757d') }}" title="Etiket rengi">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">Ekle</button>
@@ -40,7 +44,10 @@
         <ul class="list-group list-group-flush">
             @forelse($categories as $cat)
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
+                    <div class="d-flex align-items-center gap-2">
+                        @if($cat->color)
+                            <span class="rounded-circle d-inline-block border" style="width:14px;height:14px;background:{{ $cat->color }};" title="{{ $cat->color }}"></span>
+                        @endif
                         <strong>{{ $cat->name }}</strong>
                         @if($cat->description)
                             <div class="small text-muted">{{ $cat->description }}</div>
