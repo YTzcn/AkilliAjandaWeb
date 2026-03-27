@@ -11,19 +11,12 @@ use Illuminate\Support\Facades\Auth;
 class EventService
 {
     /**
-     * @var EventRepository
-     */
-    protected $eventRepository;
-
-    /**
      * EventService constructor.
-     *
-     * @param EventRepository $eventRepository
      */
-    public function __construct(EventRepository $eventRepository)
-    {
-        $this->eventRepository = $eventRepository;
-    }
+    public function __construct(
+        protected EventRepository $eventRepository,
+        protected CategoryService $categoryService
+    ) {}
 
     /**
      * Get all events for the authenticated user.
@@ -32,7 +25,7 @@ class EventService
      */
     public function getAllEvents(): Collection
     {
-        return $this->eventRepository->allByUser(Auth::id());
+        return $this->eventRepository->allByUser(Auth::id(), ['*'], ['categories']);
     }
 
     /**
@@ -71,9 +64,7 @@ class EventService
         unset($data['category_ids']);
         $data['user_id'] = Auth::id();
         $event = $this->eventRepository->create($data);
-        if ($categoryIds !== []) {
-            $event->categories()->sync($categoryIds);
-        }
+        $this->categoryService->syncCategories($event, $categoryIds);
 
         return $event->load('categories');
     }
@@ -94,7 +85,7 @@ class EventService
         }
         $event = $this->eventRepository->update($eventId, $data);
         if ($event && $categoryIds !== null) {
-            $event->categories()->sync($categoryIds);
+            $this->categoryService->syncCategories($event, $categoryIds);
 
             return $event->fresh(['categories']);
         }
@@ -121,7 +112,10 @@ class EventService
      */
     public function getEventById(int $eventId): ?Event
     {
-        return $this->eventRepository->findById($eventId);
+        /** @var Event|null $event */
+        $event = $this->eventRepository->findById($eventId, ['*'], ['categories']);
+
+        return $event;
     }
 
     public function getCalendarEvents(array $filters = []): array
@@ -138,9 +132,7 @@ class EventService
         unset($data['category_ids']);
 
         $event = $this->eventRepository->createFromCalendar($data);
-        if ($categoryIds !== []) {
-            $event->categories()->sync($categoryIds);
-        }
+        $this->categoryService->syncCategories($event, $categoryIds);
 
         return $event->load('categories');
     }
@@ -155,7 +147,7 @@ class EventService
 
         $event = $this->eventRepository->updateFromCalendar($event, $data);
         if ($categoryIds !== null) {
-            $event->categories()->sync($categoryIds);
+            $this->categoryService->syncCategories($event, $categoryIds);
         }
 
         return $event->load('categories');

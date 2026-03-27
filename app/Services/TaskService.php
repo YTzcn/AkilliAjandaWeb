@@ -21,8 +21,10 @@ class TaskService
      *
      * @param TaskRepository $taskRepository
      */
-    public function __construct(TaskRepository $taskRepository)
-    {
+    public function __construct(
+        TaskRepository $taskRepository,
+        protected CategoryService $categoryService
+    ) {
         $this->taskRepository = $taskRepository;
     }
 
@@ -168,9 +170,7 @@ class TaskService
         }
         $data['user_id'] = Auth::id();
         $task = $this->taskRepository->create($data);
-        if ($categoryIds !== []) {
-            $task->categories()->sync($categoryIds);
-        }
+        $this->categoryService->syncCategories($task, $categoryIds);
 
         return $task->fresh(['categories']);
     }
@@ -191,7 +191,7 @@ class TaskService
         }
         $task = $this->taskRepository->update($taskId, $data);
         if ($task && $categoryIds !== null) {
-            $task->categories()->sync($categoryIds);
+            $this->categoryService->syncCategories($task, $categoryIds);
 
             return $task->fresh(['categories']);
         }
