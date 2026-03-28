@@ -35,6 +35,18 @@
                     <input type="text" name="location" class="form-control @error('location') is-invalid @enderror" value="{{ old('location', $event->location) }}" maxlength="255">
                     @error('location')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">Kategoriler</label>
+                    <select name="category_ids[]" class="form-select @error('category_ids') is-invalid @enderror @error('category_ids.*') is-invalid @enderror" multiple size="4">
+                        @php $selected = old('category_ids', $event->categories->pluck('id')->all()); @endphp
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" @selected(collect($selected)->contains($cat->id))>{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="form-text">Birden fazla seçmek için Cmd/Ctrl ile tıklayın.</div>
+                    @error('category_ids')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                    @error('category_ids.*')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                </div>
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Güncelle</button>
                     <a href="{{ route('events.index') }}" class="btn btn-outline-secondary">İptal</a>

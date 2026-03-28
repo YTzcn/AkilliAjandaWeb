@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IndexEventFiltersRequest;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
+use App\Services\CategoryService;
 use App\Services\EventService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,47 +13,39 @@ use Illuminate\View\View;
 
 class EventController extends Controller
 {
-    /**
-     * @var EventService
-     */
-    protected $eventService;
-
-    /**
-     * EventController constructor.
-     *
-     * @param EventService $eventService
-     */
-    public function __construct(EventService $eventService)
-    {
-        $this->eventService = $eventService;
-    }
+    public function __construct(
+        protected EventService $eventService,
+        protected CategoryService $categoryService
+    ) {}
 
     /**
      * Display a listing of the events.
-     *
-     * @return View
      */
-    public function index(): View
+    public function index(IndexEventFiltersRequest $request): View
     {
-        $events = $this->eventService->getAllEvents();
-        return view('events.index', compact('events'));
+        $validated = $request->validated();
+        $categoryId = isset($validated['category_id']) ? (int) $validated['category_id'] : null;
+        $events = $this->eventService->getListingForWeb($categoryId);
+        $categories = $this->categoryService->listForUser();
+        $filters = [
+            'category_id' => $categoryId !== null ? (string) $categoryId : '',
+        ];
+
+        return view('events.index', compact('events', 'categories', 'filters'));
     }
 
     /**
      * Show the form for creating a new event.
-     *
-     * @return View
      */
     public function create(): View
     {
-        return view('events.create');
+        $categories = $this->categoryService->listForUser();
+
+        return view('events.create', compact('categories'));
     }
 
     /**
      * Store a newly created event in storage.
-     *
-     * @param StoreEventRequest $request
-     * @return RedirectResponse
      */
     public function store(StoreEventRequest $request): RedirectResponse
     {
@@ -63,6 +57,7 @@ class EventController extends Controller
             'end_date' => $data['end_time'],
             'location' => $data['location'] ?? null,
             'all_day' => false,
+            'category_ids' => $data['category_ids'] ?? [],
         ]);
 
         return redirect()->route('events.index')->with('success', 'Etkinlik başarıyla oluşturuldu.');
@@ -70,34 +65,27 @@ class EventController extends Controller
 
     /**
      * Display the specified event.
-     *
-     * @param int $id
-     * @return View
      */
     public function show(int $id): View
     {
         $event = $this->eventService->getEventById($id);
+
         return view('events.show', compact('event'));
     }
 
     /**
      * Show the form for editing the specified event.
-     *
-     * @param int $id
-     * @return View
      */
     public function edit(int $id): View
     {
         $event = $this->eventService->getEventById($id);
-        return view('events.edit', compact('event'));
+        $categories = $this->categoryService->listForUser();
+
+        return view('events.edit', compact('event', 'categories'));
     }
 
     /**
      * Update the specified event in storage.
-     *
-     * @param UpdateEventRequest $request
-     * @param int $id
-     * @return RedirectResponse
      */
     public function update(UpdateEventRequest $request, int $id): RedirectResponse
     {
@@ -108,6 +96,7 @@ class EventController extends Controller
             'start_date' => $data['start_time'],
             'end_date' => $data['end_time'],
             'location' => $data['location'] ?? null,
+            'category_ids' => array_values($data['category_ids'] ?? []),
         ]);
 
         return redirect()->route('events.index')->with('success', 'Etkinlik başarıyla güncellendi.');
@@ -115,21 +104,16 @@ class EventController extends Controller
 
     /**
      * Remove the specified event from storage.
-     *
-     * @param int $id
-     * @return RedirectResponse
      */
     public function destroy(int $id): RedirectResponse
     {
         $this->eventService->deleteEvent($id);
+
         return redirect()->route('events.index')->with('success', 'Etkinlik başarıyla silindi.');
     }
 
     /**
      * Display events for a specific date range.
-     *
-     * @param Request $request
-     * @return View
      */
     public function dateRange(Request $request): View
     {
@@ -155,4 +139,4 @@ class EventController extends Controller
             'endDate' => $endDate ?? now()->endOfMonth()->toDateString(),
         ]);
     }
-} 
+}

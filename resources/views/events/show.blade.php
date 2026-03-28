@@ -24,6 +24,14 @@
                     <dt class="col-sm-4 text-muted">Açıklama</dt>
                     <dd class="col-sm-8">{{ $event->description }}</dd>
                 @endif
+                <dt class="col-sm-4 text-muted">Kategoriler</dt>
+                <dd class="col-sm-8">
+                    @forelse($event->categories as $c)
+                        <span class="badge rounded-pill me-1 border" @if($c->color) style="background-color: {{ $c->color }}22;border-color: {{ $c->color }}!important;" @endif>{{ $c->name }}</span>
+                    @empty
+                        <span class="text-muted">—</span>
+                    @endforelse
+                </dd>
             </dl>
         </div>
     </div>

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Repositories\EventRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
+use App\Services\CategoryService;
 use App\Services\EventService;
 use App\Services\TaskService;
 use App\View\Components\CustomAuthLayout;
@@ -40,13 +41,15 @@ class AppServiceProvider extends ServiceProvider
         // Services
         $this->app->bind(EventService::class, function ($app) {
             return new EventService(
-                $app->make(EventRepository::class)
+                $app->make(EventRepository::class),
+                $app->make(CategoryService::class)
             );
         });
 
         $this->app->bind(TaskService::class, function ($app) {
             return new TaskService(
-                $app->make(TaskRepository::class)
+                $app->make(TaskRepository::class),
+                $app->make(CategoryService::class)
             );
         });
     }

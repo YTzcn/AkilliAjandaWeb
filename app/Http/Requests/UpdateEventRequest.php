@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateEventRequest extends FormRequest
 {
@@ -27,6 +28,11 @@ class UpdateEventRequest extends FormRequest
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'location' => 'nullable|string|max:255',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => [
+                'integer',
+                Rule::exists('categories', 'id')->where('user_id', auth()->id()),
+            ],
         ];
     }
 

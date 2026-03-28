@@ -29,6 +29,25 @@ class EventService
     }
 
     /**
+     * Web etkinlik listesi — isteğe bağlı kategori filtresi.
+     */
+    public function getListingForWeb(?int $categoryId = null): Collection
+    {
+        $query = Event::query()
+            ->where('user_id', Auth::id())
+            ->with('categories')
+            ->orderByDesc('start_date');
+
+        if ($categoryId !== null) {
+            $query->whereHas('categories', function ($q) use ($categoryId) {
+                $q->where('categories.id', $categoryId);
+            });
+        }
+
+        return $query->get();
+    }
+
+    /**
      * Get events for a specific date range.
      *
      * @param string $startDate

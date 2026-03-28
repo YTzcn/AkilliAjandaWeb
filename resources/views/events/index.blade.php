@@ -20,6 +20,28 @@
         </div>
     @endif
 
+    <div class="card mb-3">
+        <div class="card-body py-3">
+            <form method="get" action="{{ route('events.index') }}" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small text-muted mb-0">Kategoriye göre</label>
+                    <select name="category_id" class="form-select form-select-sm">
+                        <option value="">Tümü</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" @selected(($filters['category_id'] ?? '') == (string) $cat->id)>{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Filtrele</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ route('events.index') }}" class="btn btn-outline-secondary btn-sm w-100">Sıfırla</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="table-responsive">
             <table class="table table-hover mb-0 align-middle">
@@ -29,6 +51,7 @@
                         <th>Başlangıç</th>
                         <th>Bitiş</th>
                         <th>Konum</th>
+                        <th>Kategoriler</th>
                         <th class="text-end">İşlemler</th>
                     </tr>
                 </thead>
@@ -41,6 +64,13 @@
                             <td>{{ $event->start_date?->format('d.m.Y H:i') }}</td>
                             <td>{{ $event->end_date?->format('d.m.Y H:i') }}</td>
                             <td>{{ $event->location ?? '—' }}</td>
+                            <td>
+                                @forelse($event->categories as $c)
+                                    <span class="badge rounded-pill me-1 border" @if($c->color) style="background-color: {{ $c->color }}22;border-color: {{ $c->color }}!important;color: #212529;" @endif>{{ $c->name }}</span>
+                                @empty
+                                    <span class="text-muted small">—</span>
+                                @endforelse
+                            </td>
                             <td class="text-end">
                                 <a href="{{ route('events.edit', $event) }}" class="btn btn-sm btn-outline-secondary">Düzenle</a>
                                 <form method="post" action="{{ route('events.destroy', $event) }}" class="d-inline" onsubmit="return confirm('Bu etkinliği silmek istediğinize emin misiniz?');">
@@ -52,7 +82,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-muted text-center py-4">Henüz etkinlik yok.</td>
+                            <td colspan="6" class="text-muted text-center py-4">Henüz etkinlik yok.</td>
                         </tr>
                     @endforelse
                 </tbody>
