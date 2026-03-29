@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CalendarTaskRequest extends FormRequest
 {
@@ -20,7 +21,10 @@ class CalendarTaskRequest extends FormRequest
             'priority' => ['required', 'integer', 'min:1', 'max:3'],
             'status' => ['required', 'string', 'in:pending,completed'],
             'category_ids' => ['nullable', 'array'],
-            'category_ids.*' => ['exists:categories,id'],
+            'category_ids.*' => [
+                'integer',
+                Rule::exists('categories', 'id')->where('user_id', auth()->id()),
+            ],
         ];
     }
 

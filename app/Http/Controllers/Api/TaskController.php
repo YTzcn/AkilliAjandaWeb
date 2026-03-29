@@ -72,10 +72,20 @@ class TaskController extends Controller
         if ($request->has('start') && $request->has('end')) {
             $tasks = $this->service->getCalendarTasks([
                 'start' => $request->input('start'),
-                'end' => $request->input('end')
+                'end' => $request->input('end'),
             ]);
         } else {
-            $tasks = $this->service->getAllTasks();
+            $filters = $request->only([
+                'status', 'priority', 'is_completed', 'due_from', 'due_to',
+                'category_id', 'sort', 'dir',
+            ]);
+            $filters = array_filter(
+                $filters,
+                static fn ($v) => $v !== null && $v !== ''
+            );
+            $tasks = $filters === []
+                ? $this->service->getAllTasks()
+                : $this->service->getFilteredTasks($filters);
         }
 
         return response()->json($tasks);

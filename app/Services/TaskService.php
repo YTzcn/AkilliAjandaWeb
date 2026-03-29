@@ -32,7 +32,42 @@ class TaskService
      */
     public function getAllTasks(): Collection
     {
-        return $this->taskRepository->allByUser(Auth::id());
+        return $this->taskRepository->allByUser(Auth::id(), ['*'], ['categories']);
+    }
+
+    /**
+     * Web/API filtre parametreleriyle görevleri döndürür.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    public function getFilteredTasks(array $filters): Collection
+    {
+        return $this->taskRepository->filteredForUser(Auth::id(), $filters);
+    }
+
+    /**
+     * Son tarihi verilen aralıkta olan bekleyen görev sayısı.
+     */
+    public function countPendingDueBetween(\Carbon\Carbon $start, \Carbon\Carbon $end): int
+    {
+        return Task::query()
+            ->where('user_id', Auth::id())
+            ->where('is_completed', false)
+            ->where('due_date', '>=', $start->copy()->startOfDay())
+            ->where('due_date', '<=', $end->copy()->endOfDay())
+            ->count();
+    }
+
+    /**
+     * Belirtilen hafta içinde tamamlanan görev sayısı (güncelleme zamanına göre).
+     */
+    public function countCompletedInPeriod(\Carbon\Carbon $start, \Carbon\Carbon $end): int
+    {
+        return Task::query()
+            ->where('user_id', Auth::id())
+            ->where('is_completed', true)
+            ->whereBetween('updated_at', [$start->copy()->startOfDay(), $end->copy()->endOfDay()])
+            ->count();
     }
 
     /**
@@ -94,8 +129,18 @@ class TaskService
      */
     public function createTask(array $data): Task
     {
+        $categoryIds = [];
+        if (array_key_exists('category_ids', $data)) {
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['category_ids']);
+        }
         $data['user_id'] = Auth::id();
-        return $this->taskRepository->create($data);
+        $task = $this->taskRepository->create($data);
+        if ($categoryIds !== []) {
+            $task->categories()->sync($categoryIds);
+        }
+
+        return $task->fresh(['categories']);
     }
 
     /**
@@ -107,7 +152,19 @@ class TaskService
      */
     public function updateTask(int $taskId, array $data): ?Task
     {
-        return $this->taskRepository->update($taskId, $data);
+        $categoryIds = null;
+        if (array_key_exists('category_ids', $data)) {
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['category_ids']);
+        }
+        $task = $this->taskRepository->update($taskId, $data);
+        if ($task && $categoryIds !== null) {
+            $task->categories()->sync($categoryIds);
+
+            return $task->fresh(['categories']);
+        }
+
+        return $task ? $task->load('categories') : null;
     }
 
     /**
@@ -129,7 +186,10 @@ class TaskService
      */
     public function getTaskById(int $taskId): ?Task
     {
-        return $this->taskRepository->findById($taskId);
+        /** @var Task $task */
+        $task = $this->taskRepository->findById($taskId, ['*'], ['categories']);
+
+        return $task;
     }
 
     /**

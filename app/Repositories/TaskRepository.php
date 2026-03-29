@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Task;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,6 +35,56 @@ class TaskRepository extends BaseRepository
             ->with($relations)
             ->orderBy('due_date')
             ->get($columns);
+    }
+
+    /**
+     * Kullanıcıya ait görevleri filtre ve sıralama ile listeler.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    public function filteredForUser(int $userId, array $filters = [], array $relations = ['categories']): Collection
+    {
+        $query = $this->model->where('user_id', $userId)->with($relations);
+
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (! empty($filters['priority'])) {
+            $query->where('priority', (int) $filters['priority']);
+        }
+
+        if (array_key_exists('is_completed', $filters) && $filters['is_completed'] !== null && $filters['is_completed'] !== '') {
+            $val = filter_var($filters['is_completed'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($val !== null) {
+                $query->where('is_completed', $val);
+            }
+        }
+
+        if (! empty($filters['due_from'])) {
+            $query->whereDate('due_date', '>=', $filters['due_from']);
+        }
+
+        if (! empty($filters['due_to'])) {
+            $query->whereDate('due_date', '<=', $filters['due_to']);
+        }
+
+        if (! empty($filters['category_id'])) {
+            $categoryId = (int) $filters['category_id'];
+            $query->whereHas('categories', function (Builder $q) use ($categoryId) {
+                $q->where('categories.id', $categoryId);
+            });
+        }
+
+        $sort = $filters['sort'] ?? 'due_date';
+        $dir = strtolower((string) ($filters['dir'] ?? 'asc')) === 'desc' ? 'desc' : 'asc';
+        $allowedSorts = ['due_date', 'priority', 'created_at', 'title', 'status'];
+        if (! in_array($sort, $allowedSorts, true)) {
+            $sort = 'due_date';
+        }
+        $query->orderBy($sort, $dir);
+
+        return $query->get();
     }
 
     /**

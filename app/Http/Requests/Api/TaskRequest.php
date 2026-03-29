@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class TaskRequest extends FormRequest
 {
@@ -29,7 +30,10 @@ class TaskRequest extends FormRequest
             'status' => 'nullable|string|in:pending,in-progress,completed',
             'is_completed' => 'boolean',
             'category_ids' => 'nullable|array',
-            'category_ids.*' => 'exists:categories,id',
+            'category_ids.*' => [
+                'integer',
+                Rule::exists('categories', 'id')->where('user_id', auth()->id()),
+            ],
         ];
     }
 
