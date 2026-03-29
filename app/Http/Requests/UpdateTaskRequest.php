@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTaskRequest extends FormRequest
 {
@@ -25,7 +26,14 @@ class UpdateTaskRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
+            'priority' => 'nullable|integer|min:1|max:3',
+            'status' => 'nullable|string|in:pending,in-progress,completed,cancelled',
             'is_completed' => 'boolean',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => [
+                'integer',
+                Rule::exists('categories', 'id')->where('user_id', auth()->id()),
+            ],
         ];
     }
 

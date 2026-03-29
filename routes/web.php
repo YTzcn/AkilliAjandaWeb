@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\EventController as ApiEventController;
 use App\Http\Controllers\Api\TaskController as ApiTaskController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MessageController;
@@ -37,6 +38,8 @@ Route::middleware(['ensure.auth'])->group(function () {
     Route::resource('tasks', TaskController::class);
     Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
     Route::patch('/tasks/{task}/pending', [TaskController::class, 'pending'])->name('tasks.pending');
+
+    Route::resource('categories', CategoryController::class)->only(['index', 'store', 'destroy']);
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

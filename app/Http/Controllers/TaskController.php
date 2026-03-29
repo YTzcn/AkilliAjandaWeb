@@ -4,38 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Services\CategoryService;
 use App\Services\TaskService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class TaskController extends Controller
 {
     /**
-     * @var TaskService
-     */
-    protected $taskService;
-
-    /**
      * TaskController constructor.
-     *
-     * @param TaskService $taskService
      */
-    public function __construct(TaskService $taskService)
-    {
-        $this->taskService = $taskService;
-    }
+    public function __construct(
+        protected TaskService $taskService,
+        protected CategoryService $categoryService
+    ) {}
 
     /**
      * Display a listing of the tasks.
      *
      * @return View
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $pendingTasks = $this->taskService->getPendingTasks();
-        $completedTasks = $this->taskService->getCompletedTasks();
-        
-        return view('tasks.index', compact('pendingTasks', 'completedTasks'));
+        $filters = $request->only([
+            'status', 'priority', 'is_completed', 'due_from', 'due_to',
+            'category_id', 'sort', 'dir',
+        ]);
+        $tasks = $this->taskService->getFilteredTasks($filters);
+        $categories = $this->categoryService->listForUser();
+
+        return view('tasks.index', compact('tasks', 'categories', 'filters'));
     }
 
     /**
@@ -45,7 +44,9 @@ class TaskController extends Controller
      */
     public function create(): View
     {
-        return view('tasks.create');
+        $categories = $this->categoryService->listForUser();
+
+        return view('tasks.create', compact('categories'));
     }
 
     /**
@@ -81,7 +82,9 @@ class TaskController extends Controller
     public function edit(int $id): View
     {
         $task = $this->taskService->getTaskById($id);
-        return view('tasks.edit', compact('task'));
+        $categories = $this->categoryService->listForUser();
+
+        return view('tasks.edit', compact('task', 'categories'));
     }
 
     /**
