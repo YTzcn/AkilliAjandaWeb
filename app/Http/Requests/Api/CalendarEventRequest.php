@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * @OA\Schema(
@@ -70,6 +71,11 @@ class CalendarEventRequest extends FormRequest
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'all_day' => ['boolean'],
             'location' => ['nullable', 'string', 'max:255'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => [
+                'integer',
+                Rule::exists('categories', 'id')->where('user_id', auth()->id()),
+            ],
         ];
     }
 
