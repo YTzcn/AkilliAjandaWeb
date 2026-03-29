@@ -73,6 +73,7 @@ class ChatController extends Controller
      */
     public function send(Request $request): JsonResponse
     {
+        set_time_limit(120);
         try {
             $request->validate([
                 'message' => 'required|string|max:1000'
@@ -80,8 +81,7 @@ class ChatController extends Controller
 
             \Log::debug('Chat request:', [
                 'message' => $request->message,
-                'api_key' => config('services.openrouter.api_key'),
-                'user' => auth()->user()
+                'user_id' => auth()->id()
             ]);
 
             $response = $this->llmService->processUserMessage($request->message);

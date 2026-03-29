@@ -14,7 +14,7 @@ class OpenRouterProvider implements ProviderInterface
      * 
      * @var string
      */
-    protected string $model = 'google/gemini-2.0-flash-exp:free';
+    protected string $model = 'google/gemini-2.0-flash-001';
     
     /**
      * OpenRouter API anahtarı
@@ -36,6 +36,10 @@ class OpenRouterProvider implements ProviderInterface
     public function __construct()
     {
         $this->apiKey = Config::get('services.openrouter.api_key');
+        $configModel = Config::get('llm.models.openrouter.default');
+        if ($configModel) {
+            $this->model = $configModel;
+        }
     }
     
     /**
@@ -240,7 +244,7 @@ class OpenRouterProvider implements ProviderInterface
      */
     private function callOpenRouter(array $data): array
     {
-        $response = Http::withHeaders([
+        $response = Http::timeout(120)->withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',
             'HTTP-Referer' => config('app.url'),
