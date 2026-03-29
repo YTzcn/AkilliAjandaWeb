@@ -43,14 +43,34 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
         $oneWeekLater = Carbon::today()->addWeek();
+        $weekStart = Carbon::now()->startOfWeek();
+        $weekEnd = Carbon::now()->endOfWeek();
 
         $upcomingEvents = $this->eventService->getEventsForDateRange(
             $today->format('Y-m-d H:i:s'),
             $oneWeekLater->format('Y-m-d H:i:s')
         );
-        
+
+        $weekEvents = $this->eventService->getEventsForDateRange(
+            $weekStart->format('Y-m-d H:i:s'),
+            $weekEnd->format('Y-m-d H:i:s')
+        );
+
         $pendingTasks = $this->taskService->getPendingTasks();
 
-        return view('dashboard', compact('upcomingEvents', 'pendingTasks'));
+        $weekTasksDue = $this->taskService->countPendingDueBetween($weekStart, $weekEnd);
+        $weekTasksCompleted = $this->taskService->countCompletedInPeriod($weekStart, $weekEnd);
+        $overdueCount = $this->taskService->getOverdueTasks()->count();
+
+        return view('dashboard', compact(
+            'upcomingEvents',
+            'pendingTasks',
+            'weekEvents',
+            'weekTasksDue',
+            'weekTasksCompleted',
+            'overdueCount',
+            'weekStart',
+            'weekEnd'
+        ));
     }
 } 
