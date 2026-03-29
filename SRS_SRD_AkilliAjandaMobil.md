@@ -1,247 +1,147 @@
-# Akıllı Ajanda Mobil Uygulaması SRS + SRD Dökümanı
-
+## Akıllı Ajanda Web Uygulaması 
 ---
 
 ## 1. Tanıtım
 
 ### 1.1. Proje Amacı ve Özeti
-Akıllı Ajanda Mobil Uygulaması, kullanıcıların etkinlik ve görevlerini kolayca yönetebileceği, Google Takvim ile entegre olabilen, bildirim ve gerçek zamanlı güncellemeler sunan bir mobil ajanda uygulamasıdır. Proje, kullanıcıların günlük yaşamlarını daha verimli planlamalarını ve organize olmalarını hedefler. Kullanıcılar, etkinlik ve görevlerini tek bir platformda yönetebilir, hatırlatıcılar ve bildirimler ile zaman yönetimini optimize edebilir.
+Akıllı Ajanda Web Uygulaması, kullanıcıların etkinlik ve görevlerini tek bir yerden yönetebildiği, Google Calendar ile entegre çalışabilen, gerçek zamanlı güncellemeler ve bildirimler sunan, yapay zeka destekli bir ajanda ve görev yönetim sistemidir. Kullanıcılar, web arayüzü üzerinden etkinlik ve görev oluşturabilir, güncelleyebilir, silebilir; takvimlerini görüntüleyebilir, özet raporlar alabilir ve LLM tabanlı sohbet asistanı üzerinden doğal dil ile ajandalarını yönetebilir.
 
 ### 1.2. Kapsam
 - Etkinlik ve görev yönetimi (oluşturma, güncelleme, silme, tamamlama)
-- Google Takvim entegrasyonu (çift yönlü senkronizasyon, içe/dışa aktarma)
-- Gerçek zamanlı bildirimler (Pusher ile anlık güncellemeler)
-- Modern ve kullanıcı dostu arayüz (React Native ile responsive tasarım)
-- Profil ve hesap yönetimi (kayıt, giriş, şifre sıfırlama, profil güncelleme)
-- Güvenli oturum ve veri yönetimi (JWT, OAuth2, güvenli depolama)
+- Google Calendar entegrasyonu (iki yönlü senkronizasyon, içe/dışa aktarma)
+- Gerçek zamanlı güncellemeler (Pusher ile kanal bazlı bildirimler)
+- Yapay zeka destekli sohbet asistanı (LLM ile doğal dil komutları)
+- Bildirim sistemi (in-app, push altyapısına hazırlık)
+- Kullanıcı ve profil yönetimi (kayıt, giriş, e-posta doğrulama, şifre sıfırlama)
 
 ### 1.3. Sorun ve Hedef Analizi
-- **Sorun:** Mevcut ajanda uygulamalarında entegrasyon, bildirim ve kullanıcı deneyimi eksiklikleri bulunmaktadır. Kullanıcılar, farklı platformlar arasında veri kaybı, senkronizasyon sorunları ve karmaşık arayüzlerle karşılaşmaktadır.
-- **Hedef:** Kullanıcıların tüm ajanda ihtiyaçlarını tek bir uygulamada, entegre ve kolay kullanılabilir şekilde karşılamak. Google Takvim ile tam uyumlu, hızlı, güvenli ve erişilebilir bir ajanda deneyimi sunmak.
+- **Sorun:** Farklı takvim ve görev uygulamaları arasında dağılmış veriler, senkronizasyon problemleri, zayıf entegrasyonlar ve kullanıcıya yük olan karmaşık ara yüzler.
+- **Hedef:** Tüm takvim ve görev işlemlerini tek bir web uygulamasında toplamak, Google Calendar ile tam uyumlu, gerçek zamanlı, güvenli ve kullanıcı dostu bir ajanda deneyimi sunmak; yapay zeka desteğiyle doğal dilde ajanda yönetimini mümkün kılmak.
 
 ### 1.4. Vision & Scope
-- Kullanıcıların tüm takvim ve görev yönetimi ihtiyaçlarını karşılamak
-- Mobil platformlarda (iOS/Android) erişilebilirlik
-- Güvenli ve sürdürülebilir bir yazılım altyapısı
-- Geliştirilebilir ve modüler mimari
+- Kullanıcıların günlük, haftalık ve aylık planlarını web üzerinden tek ekrandan yönetebilmesi
+- Mevcut harici servislerle (özellikle Google Calendar) güçlü entegrasyon
+- Genişletilebilir, modüler ve sürdürülebilir bir backend mimarisi
+- İleride mobil ve diğer istemcilere hizmet verebilecek ölçeklenebilir API katmanı
 
 ---
 
 ## 2. Planlama
 
-### 2.1. Gant Diyagramı
-- **Buraya projenin iş zaman çizelgesi (Gant diyagramı) eklenecek.**
-- Örnek aşamalar: Analiz, Tasarım, Geliştirme, Test, Dağıtım, Bakım
-
-### 2.2. Ekip Yapısı
-- **Buraya ekip şeması eklenecek.**
-- Proje Yöneticisi: Proje planlaması ve koordinasyon
-- Yazılım Geliştirici(ler): Mobil uygulama ve backend geliştirme
-- Test Sorumlusu: Test planı, manuel ve otomasyon testleri
-- Analist: Gereksinim toplama, dokümantasyon
-
-### 2.3. Kaynaklar
-- İnsan Kaynakları: 2 React Native geliştirici, 1 backend geliştirici, 1 test uzmanı
-- Donanım Kaynakları: Geliştirme bilgisayarları (Mac/Windows), iOS ve Android test cihazları
-- Yazılım Kaynakları: React Native, Node.js, Google API, Pusher, Firebase, Git, VSCode, Postman
-
-### 2.4. Alt Planlama Başlıkları
-- Analiz, tasarım, geliştirme, test ve dağıtım için ayrı Gant diyagramları ve ekip/zaman/kaynak planı **(Buraya eklenecek)**
+### 2.1. Kaynaklar
+- **Sunucu tarafı:** PHP 8+, Laravel 12, PostgreSQL veritabanı
+- **İstemci tarafı:** Blade template’ler, Tailwind CSS, Alpine.js, gerekli yerlerde Bootstrap bileşenleri
+- **Yardımcı servisler:** Pusher (broadcasting), Firebase (push altyapısı için), Google API (Calendar), OpenAI / Gemini / OpenRouter (LLM)
+- **Geliştirme araçları:** Git, Composer, NPM, Vite, Postman, IDE (Cursor/VSCode)
 
 ---
 
 ## 3. Çözümleme
 
 ### 3.1. Mevcut Sistem Analizi
-- **Buraya mevcut sistemin use case diyagramı ve işleyiş senaryosu eklenecek.**
-- Mevcut sistemlerde genellikle sadece temel etkinlik yönetimi ve sınırlı entegrasyon bulunur. Bildirimler ve gerçek zamanlı güncellemeler eksiktir.
-- Eksik yönler: Zayıf entegrasyon, yetersiz bildirim, karmaşık arayüz, veri kaybı riski.
-- Önerilen sistem, bu eksiklikleri güçlü entegrasyon, anlık bildirim, sade arayüz ve güvenli veri yönetimi ile çözer.
+- Geleneksel ajanda ve takvim uygulamalarında genellikle tek yönlü entegrasyon, sınırlı görev yönetimi ve zayıf gerçek zamanlı bildirim yetenekleri bulunur.
+- Kullanıcılar, Google Calendar, görev listeleri ve not uygulamaları gibi farklı araçlar arasında veri taşımak zorunda kalır; bu da veri kaybına ve yönetim zorluğuna yol açar.
+- Önerilen web sistemi, bu eksiklikleri tek merkezde toplanmış görev/etkinlik yönetimi, güçlü Google Calendar entegrasyonu, gerçek zamanlı güncellemeler ve LLM tabanlı akıllı asistan ile gidermeyi hedefler.
 
 ### 3.2. Önerilen Sistem
 - **İşlevsel Model:**
-  - Use case diyagramları **(Buraya eklenecek)**
-  - Her bir use case için metinsel senaryolar (ör. "Kullanıcı yeni etkinlik ekler, sistem etkinliği takvime kaydeder ve Google Takvim ile senkronize eder.")
-- **Bilgi Sistemleri/Nesneler:**
-  - Sınıf diyagramları **(Buraya eklenecek)**
-  - Sınıflar: User, Event, Task, Notification, Calendar, GoogleIntegration, vb.
-  - Her sınıfın amacı ve senaryolarla ilişkisi (ör. Event sınıfı, etkinliklerin tüm özelliklerini ve ilişkili görevleri yönetir.)
-  - Veri modeli: Kullanıcı, etkinlik, görev, bildirim ve entegrasyon tabloları
-- **UML Diyagramları:**
-  - Sınıf, Aktivite, Durum, Sıralama, Bileşen, Dağıtım, Paket diyagramları **(Buraya eklenecek)**
-- **Arayüzler:**
-  - Login, Register, Dashboard, Calendar, Task, Profile, Settings, Notification ekranları
-  - Her arayüzün kısa tanımı ve kullanıcıya sağladığı işlevler
-  - Arayüzlerin maliyet kestirim dokümanında kullanılıp kullanılmadığı belirtilecek
+  - Kullanıcı ile sistem arasındaki temel etkileşimler; "Kayıt Ol / Giriş Yap", "Etkinlik Oluşturma / Güncelleme / Silme", "Görev Oluşturma / Tamamlama", "Takvim Görüntüleme", "Google Calendar ile Senkronizasyon", "Sohbet Asistanına Komut Verme" gibi use case’ler üzerinden tanımlanır.
+  - Her bir use case için, kullanıcının başlattığı aksiyon (örneğin yeni etkinlik ekleme), sistemin bunu veritabanı ve Google Calendar üzerinde nasıl işlediği ve hata durumlarında (örneğin Google erişim hatası) kullanıcıya nasıl geri bildirim verildiği metinsel senaryolarla açıklanır.
+- **Bilgi Sistemleri / Nesneler:**
+  - Temel modeller: User, Event, Task, Notification, Message (LLM mesajları), UserDevice, Category vb.
+  - User, sisteme giriş yapan hesapları temsil eder; Event, takvimdeki zaman bazlı etkinliklerdir; Task, son tarih ve öncelik bilgisi olan görevlerdir; Notification, kullanıcıya gösterilen sistem bildirimlerini; Message, kullanıcı–LLM etkileşim kayıtlarını; Category ise görevleri kategorize etmeyi sağlar.
+  - User ile Event, Task, Notification ve Message arasında bire çok ilişkiler tanımlanır; görev–kategori ilişkisi için çoktan çoğa bir yapı (category_task pivot tablosu) öngörülür.
+- **UML Açıklamaları:**
+  - Tipik bir istek akışında, istemciden (web tarayıcısı) gelen HTTP isteği Laravel routing katmanına gelir, ilgili Controller’a yönlendirilir; Controller iş kurallarını ilgili Service sınıflarına devreder; servisler Eloquent modelleri üzerinden PostgreSQL’e erişir ve gerektiğinde Google Calendar veya LLM sağlayıcılarına API çağrısı yapar; sonuç, Blade şablonları veya JSON API cevapları ile istemciye döner.
 
 ---
 
 ## 4. Tasarım
 
-### 4.1. Mimari Akış Diyagramı
-- **Buraya sistemin tasarım mimarisi akış diyagramı eklenecek.**
-- Mimari: Katmanlı mimari (Presentation, Business Logic, Data, Integration)
-- Seçim nedeni: Modülerlik, sürdürülebilirlik, kolay test edilebilirlik
-- Katmanlar arası iletişim: API servisleri, MobX store, React Navigation
+### 4.1. Mimari
+- Uygulama, katmanlı bir mimari yaklaşımıyla tasarlanır:
+  - **Sunum katmanı:** Blade view’lar, Tailwind/Bootstrap ile stillendirilmiş arayüzler, Alpine.js ile hafif etkileşimler.
+  - **Uygulama katmanı:** Laravel Controller’ları, Request/Response nesneleri, doğrulama katmanı.
+  - **İş mantığı katmanı:** Service sınıfları (EventService, TaskService, LLMService, GoogleCalendarService, NotificationService vb.).
+  - **Veri katmanı:** Eloquent modeller, repository benzeri sorgu katmanı, PostgreSQL veritabanı.
+  - **Entegrasyon katmanı:** Google API istemcileri, LLM sağlayıcı adapter’ları, Pusher kanalları.
+- Katmanlar arası geçişler net arayüzlerle sınırlandırılır; Controller’lar sadece koordinasyon yapar, ağır iş mantığı servislerde tutulur.
 
-### 4.2. Arabirimler ve Modüller
-- **Arabirimler:**
-  - Kullanıcı arayüzü: React Native bileşenleri, özelleştirilebilir tema
-  - API arabirimi: Axios ile RESTful API iletişimi
-  - Google Takvim arabirimi: OAuth2 ile güvenli bağlantı, etkinlik senkronizasyonu
-- **Modüller:**
-  - AuthService: Kimlik doğrulama, oturum yönetimi
-  - TaskService: Görev CRUD işlemleri, öncelik ve tamamlanma
-  - EventService: Etkinlik CRUD işlemleri, takvim yönetimi
-  - GoogleCalendarService: Google ile bağlantı, etkinlik senkronizasyonu
-  - PusherService: Gerçek zamanlı bildirimler
-  - CalendarStore: Etkinlik ve görevlerin global yönetimi (MobX)
-- Her modülün kullanıcı profilleriyle ilişkisi ve test kriterleri
-- Modüller arası entegrasyon ve test işlemlerinin akış diyagramı **(Buraya eklenecek)**
-- Ortak alt sistemler: Bildirim altyapısı, kullanıcı yönetimi
+### 4.2. Web Arayüzleri
+- **Dashboard:** Günlük/haftalık özet, yaklaşan etkinlik ve görevler, kritik bildirimler ve kısa LLM önerileri gösterilir.
+- **Takvim (Calendar) Sayfası:** Gün/hafta/ay görünümleri, etkinliklerin görsel olarak gösterimi, tıklayarak etkinlik detayı ve düzenleme imkânı.
+- **Görev (Tasks) Sayfası:** Görev listesi, durum (bekliyor, devam ediyor, tamamlandı), öncelik ve tarih filtreleri; hızlı tamamlama ve düzenleme aksiyonları.
+- **Sohbet (Chat) Sayfası:** LLM ile etkileşim alanı; kullanıcı doğal dilde komut verir (ör. "yarın 15.00’e toplantı ekle"), sistem sonucu gösterip gerekli kayıtları oluşturur.
+- **Profil ve Ayarlar:** Kullanıcı bilgileri, parola değişimi, bildirim tercihleri, Google Calendar bağlantısını yönetme.
+- **Bildirimler:** Okunmamış bildirimlerin listesi, tek tek veya toplu okundu işaretleme, önemli uyarıların vurgulanması.
 
 ---
 
 ## 5. Gerçekleştirme
 
-### 5.1. Teknoloji ve Araçlar
-- Programlama dilleri: TypeScript, JavaScript
-- Kullanılan araçlar: React Native (mobil), Node.js (backend), Firebase (bildirim), Pusher (gerçek zamanlı), Google API (entegrasyon), Git (sürüm kontrol)
-- Seçim nedenleri: Platform bağımsızlık, geniş topluluk, hızlı geliştirme, kolay entegrasyon
+### 5.1. Teknolojiler
+- **Backend:** Laravel 12, PHP 8+, Eloquent ORM, Laravel Sanctum (API auth), Queue & Jobs (arka plan işlemleri).
+- **Veritabanı:** PostgreSQL, ilişkisel şema (users, events, tasks, notifications, messages, user_devices, categories, category_task vb.).
+- **Frontend:** Blade, Tailwind CSS, Alpine.js, gerektiği yerlerde Bootstrap bileşenleri.
+- **Gerçek Zamanlı:** Pusher kanalları ile broadcast event’leri (ör. görev/etkinlik güncelleme).
+- **LLM:** LLMService aracılığıyla Gemini, OpenAI ve OpenRouter sağlayıcıları; sağlayıcılar arasında geçiş için yapılandırılabilir bir provider mantığı.
+- **Diğer:** L5-Swagger ile API dokümantasyonu, Google Calendar entegrasyonu için `spatie/laravel-google-calendar` ve Google API istemcileri.
 
-### 5.2. Veri Tabanı Yönetimi
-- Kullanılan veri tabanı: (ör. Firebase/Firestore veya backend ile ilişkili bir SQL/NoSQL veritabanı)
-- Mimari: Kullanıcı, etkinlik, görev, bildirim ve entegrasyon tabloları
-- ERD/varlık ilişki diyagramı **(Buraya eklenecek)**
-- Veri modeli ile ilişkisi: Her kullanıcıya ait etkinlik ve görevler, bildirimler ve entegrasyon kayıtları
+### 5.2. Veri Tabanı Tasarımı
+- Users tablosu, kimlik, iletişim ve Google entegrasyon durumunu tutar (ör. google_token, google_calendar_connected).
+- Events tablosu, user_id bağlantısı ile kullanıcıya bağlı etkinlikleri, başlık, açıklama, başlangıç/bitiş tarihleri, all_day ve google_event_id gibi alanları barındırır.
+- Tasks tablosu, user_id ile kullanıcıya bağlı görevleri, due_date, priority, status ve isteğe bağlı Google senkronizasyon alanlarını içerir.
+- Notifications, Messages ve UserDevices tabloları, bildirim, LLM mesaj geçmişi ve cihaz token’larını yönetir.
+- Category ve category_task ile görevlerin kategorize edilmesi sağlanır.
 
-### 5.3. Standartlar ve Kod Gözden Geçirme
-- Kodlama standartları: Airbnb/Google JS/TS standartları, Prettier, ESLint
-- Kod gözden geçirme: Pull request, code review, otomatik testler
-
-### 5.4. Olağan Dışı Durumlar
-- API hataları, bağlantı kopması, Google entegrasyonunda yetki kaybı gibi durumlar için hata yönetimi ve kullanıcıya bilgilendirme
-- Otomatik yeniden deneme ve hata loglama
+### 5.3. LLM ve Entegrasyon Tasarımı
+- LLMService, gelen kullanıcı mesajını alır, uygun sağlayıcıyı (Gemini/OpenAI/OpenRouter) seçer, isteği ilgili adapter üzerinden API’ye iletir ve yanıtı sistemin anlayacağı yapılara dönüştürür (örneğin "yeni görev oluştur" komutu için görev alanları).
+- GoogleCalendarService, kullanıcı adına Google Calendar’da etkinlik oluşturma/güncelleme/silme ve mevcut etkinlikleri içeri aktarma işlemlerini yürütür; bağlantı durumu ve hata yönetimi için kullanıcıya bildirim gönderir.
 
 ---
 
 ## 6. Test
 
-### 6.1. Test Planı ve Gant Diyagramı
-- Doğrulama ve geçerleme işlemlerinin iş zaman planı **(Buraya eklenecek)**
-- Test aşamaları: Birim test, entegrasyon testleri, kullanıcı kabul testi (UAT)
+### 6.1. Test Planı
+- Birim testler: Servis katmanındaki temel fonksiyonlar, model ilişkileri ve yardımcı sınıflar test edilir.
+- Entegrasyon testleri: API endpoint’leri, Google Calendar ve LLM entegrasyonlarının beklenen şekilde çalışması doğrulanır.
+- Kullanıcı kabul testleri (UAT): Tipik kullanıcı senaryoları (görev/etkinlik yönetimi, Google bağlantısı, sohbet asistanı kullanımı) adım adım test edilir.
 
-### 6.2. Test Yöntemleri ve Araçları
-- Birim testler: Jest, React Native Testing Library
-- Entegrasyon testleri: Manuel ve otomasyon test senaryoları
-- Kullanıcı testleri: Kullanıcı hikayeleri bazında senaryolar
-- Test araçlarının işleyişi: Otomatik testler CI/CD pipeline'ında çalıştırılır
-
-### 6.3. Test Süreci
-- Test ortamı kurulumu, test verisi oluşturma, hata takibi ve raporlama
-- Doğrulama ve geçerleme işlemlerinin nasıl yapılacağı, testten geçmeyen modüllerin yeniden geliştirilmesi
+### 6.2. Test Araçları
+- PHPUnit ve Laravel test araçları, Postman koleksiyonları, gerektiğinde browser tabanlı manuel testler.
 
 ---
 
-## 7. Bakım
+## 7. Bakım ve İşletim
 
-### 7.1. Kurulum ve Destek
-- Uygulamanın App Store/Google Play'e yüklenmesi
-- Kullanıcıya kurulum sonrası destek için e-posta ve canlı destek kanalları
-- Kurulum ve entegrasyon aşamalarında yapılacaklar: Sürüm güncellemeleri, veri migrasyonu, entegrasyon anahtarlarının yönetimi
-
-### 7.2. Sürdürülebilirlik ve Uzun Vadeli Bakım
-- Kodun modüler ve dokümante olması
-- Otomatik testler ve CI/CD ile sürekli entegrasyon
-- Geriye dönük uyumluluk ve veri yedekleme stratejileri
-- Açık kaynak kütüphanelerin güncel tutulması
+- Kodun modüler yapıda tutulması, servislerin ayrı ayrı geliştirilebilir ve test edilebilir olması.
+- CI/CD hattında otomatik test, build ve deploy adımlarının çalıştırılması.
+- Loglama ve monitoring (Laravel log’ları, isteğe bağlı harici izleme servisleri) ile sorun tespiti.
 
 ---
 
-## 8. Sonuç
+## 8. Sonuç ve Değerlendirme
 
-### 8.1. Değerlendirme
-- Uygulama, mevcut ajanda uygulamalarına göre daha kapsamlı entegrasyon, anlık bildirim ve kullanıcı dostu arayüz sunar.
-- Google Takvim ile çift yönlü senkronizasyon, görev ve etkinliklerin tek ekranda yönetimi, güvenli oturum ve veri yönetimi ile öne çıkar.
-- Avantajlar: Hızlı, güvenli, entegre, kullanıcı odaklı
-- Dezavantajlar: Yüksek entegrasyon bağımlılığı, internet gereksinimi
-- Kısıtlar: Sadece mobil platformlar, Google hesabı gerekliliği
-- Benzer sistemlerle tablo halinde karşılaştırma **(Buraya tablo eklenecek)**
-- Dezavantajların gelecekte nasıl iyileştirilebileceği: Diğer takvim servisleriyle entegrasyon, offline mod, gelişmiş bildirim seçenekleri
+- Akıllı Ajanda Web Uygulaması, ajanda, görev, entegrasyon ve yapay zeka özelliklerini tek bir çatı altında toplayarak mevcut çözümlere göre daha entegre ve esnek bir deneyim sunar.
+- Güçlü entegrasyonlar (özellikle Google Calendar), ilişkisel PostgreSQL veritabanı ve modüler Laravel mimarisi sayesinde hem teknik olarak sürdürülebilir hem de yeni özelliklere açık bir yapı hedeflenmektedir.
 
 ---
 
-## 9. Kaynaklar
-- Geliştirme süreçlerinde yararlanılan tüm kaynaklar numaralandırılarak yazılacak.
-- Doküman içinde kaynak gösterimi yapılacak.
-- Örnek: 
-  1. Baykara M., "Bilgi Sistemleri ve Güvenliği Ders Notları", JISA, ss. 89-101, 2023.
-  2. React Native Resmi Dokümantasyonu
-  3. Google Calendar API Dökümantasyonu
-  4. Pusher Resmi Dokümantasyonu
-  5. ...
+## 9. İş Paketleri ve Zaman Planı
 
----
+Uygulamanın bundan sonraki geliştirme süreci, bugünden itibaren 11 haftaya yayılan, her biri yaklaşık bir haftalık küçük ve tamamlanabilir iş paketlerine ayrılmıştır. Aşağıdaki tabloda her haftanın tarih aralığı, iş paketi ve kısa açıklaması verilmiştir.
 
-## 10. Ekler ve Zorunlu Unsurlar
-- İş Zaman Çizelgesi (Gant diyagramı)
-- UML Diyagramlarının tamamı
-- ERD Diyagramları (Varlık ilişki diyagramları)
-- Veri Sözlüğü (ör. Event: Etkinlik, Task: Görev, User: Kullanıcı, ...)
-- Veri akış diyagramları
-- İş akış diyagramları
-- Veri tabanı diyagramları
-- Rich Picture
-- Context Diyagramı
-- Mimari yapıları gösteren diyagramlar
-- Alt sistemleri gösteren diyagramlar
+| Hafta | Tarih Aralığı                | İş Paketi Başlığı                               | Kısa Açıklama |
+|-------|------------------------------|-------------------------------------------------|--------------|
+| 1     | 10.03.2026 – 16.03.2026      | Temel görev filtreleme ve sıralama             | Görev listesinin tarih, öncelik ve duruma göre filtrelenebilmesi ve sıralanabilmesi. |
+| 2     | 17.03.2026 – 23.03.2026      | Haftalık özet ve dashboard iyileştirmeleri     | Dashboard ekranına haftalık görev/etkinlik özeti ve basit istatistik kartlarının eklenmesi. |
+| 3     | 24.03.2026 – 30.03.2026      | Görev ve etkinliklere kategori/etiket sistemi  | Görev ve etkinliklere kategori ya da etiket atama, listelemede kategoriye göre filtreleme. |
+| 4     | 31.03.2026 – 06.04.2026      | Gelişmiş arama (metin tabanlı)                 | Başlık ve açıklamaya göre hızlı arama çubuğu ile görev/etkinlik bulma özelliği. |
+| 5     | 07.04.2026 – 13.04.2026      | Basit raporlama ve dışa aktarma                | Belirli tarih aralığındaki görev ve etkinlikleri özetleyen basit rapor ve PDF/CSV dışa aktarma. |
+| 6     | 14.04.2026 – 20.04.2026      | Bildirim tercihleri ve sessiz zamanlar         | Kullanıcının bildirim türlerini (in-app, e-posta/push altyapısına hazırlık) ve sessiz saat aralıklarını ayarlayabilmesi. |
+| 7     | 21.04.2026 – 27.04.2026      | Karanlık mod ve tema ayarları                  | Web arayüzünde açık/koyu tema desteği ve kullanıcı bazlı tema seçimi. |
+| 8     | 28.04.2026 – 04.05.2026      | Basit kullanıcı tercihleri ve görünüm ayarları | Liste yoğunluğu, tarih gösterimi ve varsayılan takvim görünümü (gün/hafta/ay) gibi basit kullanıcı tercihlerinin eklenmesi. |
+| 9     | 05.05.2026 – 11.05.2026      | Onboarding ve yardım içerikleri                | İlk kez giriş yapan kullanıcılar için kısa tanıtım ekranları ve yardım/SSS sayfası. |
+| 10    | 12.05.2026 – 18.05.2026      | Performans ve kullanılabilirlik iyileştirmeleri | Liste ve takvim sayfalarının performansının artırılması, küçük UX düzenlemeleri ve geri bildirimlere göre iyileştirmeler. |
+| 11    | 19.05.2026 – 25.05.2026      | Hata izleme, bug tespiti ve düzeltmeleri       | Geliştirme sürecinde bilinen ve yeni tespit edilen hataların listelenmesi, önceliklendirilmesi, çözülmesi ve uygulamanın genel stabilitesinin gözden geçirilmesi. |
 
----
-
-## 11. Ek Değerlendirme Başlıkları
-
-### 11.1. Risk Analizi ve Yönetimi
-- Proje sırasında karşılaşılabilecek riskler: Google API değişiklikleri, veri kaybı, güvenlik açıkları, kullanıcı kabulü eksikliği
-- Yönetim stratejileri: Yedekleme, çoklu entegrasyon, düzenli güncelleme, kullanıcı eğitimi
-- Olasılık ve etki matrisli risk tablosu **(Buraya eklenecek)**
-
-### 11.2. Güvenlik Önlemleri
-- JWT ile güvenli oturum yönetimi
-- Şifrelerin hashlenerek saklanması
-- OAuth2 ile Google entegrasyonu ve token yönetimi
-- API anahtarlarının güvenli saklanması (env dosyaları)
-- Kullanıcı verilerinin şifrelenmesi ve gizlilik politikası
-- Yetkisiz erişimlerin önlenmesi için rol tabanlı erişim kontrolü
-
-### 11.3. Kullanıcı Deneyimi (UX) Değerlendirmesi
-- Kullanıcı arayüzü için kullanılabilirlik testleri (ör. kullanıcıya görev ekletme, etkinlik silme senaryosu)
-- Kullanıcı geri bildirimleri: Anket, uygulama içi değerlendirme, A/B testleri
-- Erişilebilirlik: Renk kontrastı, büyük butonlar, sesli bildirimler
-- Kullanıcıdan alınan geri bildirimlerle sürekli iyileştirme
-
-### 11.4. DevOps ve CI/CD
-- Otomasyon araçları: GitHub Actions, Bitrise, Fastlane
-- Sürüm kontrol: Git, branch yönetimi, kod gözden geçirme
-- Otomatik test ve dağıtım pipeline'ı
-- Sürüm notları ve rollback stratejileri
-
-### 11.5. Yasal ve Etik Hususlar
-- Kullanıcı verilerinin gizliliği ve KVKK/GDPR uyumluluğu
-- Kullanıcıdan açık rıza alınması (Google entegrasyonu, bildirimler)
-- Açık kaynak ve üçüncü parti kütüphanelerin lisanslarının kontrolü
-- Uygulamanın etik kullanımına dair kullanıcı sözleşmesi
-
-### 11.6. Müşteri ve Paydaş Geri Bildirim Süreci
-- Geri bildirim toplama: Uygulama içi formlar, e-posta, sosyal medya
-- Geri bildirimlerin değerlendirilmesi ve sürümlere yansıtılması
-- Paydaşlarla düzenli toplantılar ve demo sunumları
-
-### 11.7. Sistem Entegrasyonu ve API Yönetimi
-- Dış sistemlerle entegrasyon: Google Calendar API, Firebase, Pusher
-- API tasarım prensipleri: RESTful, JSON veri formatı, hata yönetimi
-- API anahtarlarının güvenli yönetimi
-- Gelecekte eklenebilecek diğer entegrasyonlar için modüler API altyapısı
-
----
-
-> **Not:** Tüm diyagram, tablo ve görseller ilgili başlık altına eklenecektir. Eksik olanlar için yer tutucu bırakılmıştır. Görsel ve diyagramları ekledikten sonra doküman tamamlanacaktır. 
