@@ -30,9 +30,9 @@ Route::middleware(['ensure.auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
     
-    // Events
-    Route::resource('events', EventController::class);
+    // Events (date-range önce: aksi halde /events/{event} "date-range" ile çakışır)
     Route::get('/events/date-range', [EventController::class, 'dateRange'])->name('events.date-range');
+    Route::resource('events', EventController::class);
     
     // Tasks
     Route::resource('tasks', TaskController::class);

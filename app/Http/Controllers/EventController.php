@@ -55,7 +55,16 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request): RedirectResponse
     {
-        $this->eventService->createEvent($request->validated());
+        $data = $request->validated();
+        $this->eventService->createEvent([
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'start_date' => $data['start_time'],
+            'end_date' => $data['end_time'],
+            'location' => $data['location'] ?? null,
+            'all_day' => false,
+        ]);
+
         return redirect()->route('events.index')->with('success', 'Etkinlik başarıyla oluşturuldu.');
     }
 
@@ -92,7 +101,15 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, int $id): RedirectResponse
     {
-        $this->eventService->updateEvent($id, $request->validated());
+        $data = $request->validated();
+        $this->eventService->updateEvent($id, [
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'start_date' => $data['start_time'],
+            'end_date' => $data['end_time'],
+            'location' => $data['location'] ?? null,
+        ]);
+
         return redirect()->route('events.index')->with('success', 'Etkinlik başarıyla güncellendi.');
     }
 
@@ -116,16 +133,26 @@ class EventController extends Controller
      */
     public function dateRange(Request $request): View
     {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date'
+        $events = collect();
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        if ($startDate !== null || $endDate !== null) {
+            $validated = $request->validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after_or_equal:start_date',
+            ]);
+
+            $events = $this->eventService->getEventsForDateRange(
+                $validated['start_date'],
+                $validated['end_date']
+            );
+        }
+
+        return view('events.date_range', [
+            'events' => $events,
+            'startDate' => $startDate ?? now()->startOfMonth()->toDateString(),
+            'endDate' => $endDate ?? now()->endOfMonth()->toDateString(),
         ]);
-
-        $events = $this->eventService->getEventsForDateRange(
-            $request->start_date,
-            $request->end_date
-        );
-
-        return view('events.date_range', compact('events'));
     }
 } 
