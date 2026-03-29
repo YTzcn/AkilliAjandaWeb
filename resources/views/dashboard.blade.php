@@ -458,7 +458,12 @@
 <div class="container-fluid">
     <!-- Başlık ve Tarih -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Hoş Geldiniz, {{ Auth::user()->name }}</h1>
+        <div>
+            <h1 class="h3 mb-0">Hoş Geldiniz, {{ Auth::user()->name }}</h1>
+            <p class="text-muted small mb-0 mt-1">
+                Bu hafta ({{ $weekStart->locale('tr')->isoFormat('D MMM') }} – {{ $weekEnd->locale('tr')->isoFormat('D MMM YYYY') }}): etkinlik ve görev özeti aşağıdadır.
+            </p>
+        </div>
         <div class="d-flex align-items-center">
             <div class="text-muted me-3">{{ Carbon\Carbon::now()->locale('tr')->isoFormat('LL') }}</div>
             <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#chatOffcanvas">
@@ -507,6 +512,31 @@
                                     <div>
                                         <h6 class="mb-1">Bekleyen Görevler</h6>
                                         <h3 class="mb-0">{{ $pendingTasks->count() }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body py-3">
+                                <h6 class="text-muted text-uppercase small mb-3">Haftalık özet</h6>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="small text-muted">Bu haftaki etkinlikler</div>
+                                        <div class="fs-4 fw-semibold">{{ $weekEvents->count() }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="small text-muted">Bu hafta son tarihi gelen görevler</div>
+                                        <div class="fs-4 fw-semibold">{{ $weekTasksDue }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="small text-muted">Geciken görevler</div>
+                                        <div class="fs-4 fw-semibold text-danger">{{ $overdueCount }}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="small text-muted">Bu hafta tamamlanan görevler</div>
+                                        <div class="fs-4 fw-semibold text-success">{{ $weekTasksCompleted }}</div>
                                     </div>
                                 </div>
                             </div>
