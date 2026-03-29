@@ -54,8 +54,15 @@ class EventService
      */
     public function createEvent(array $data): Event
     {
+        $categoryIds = $data['category_ids'] ?? [];
+        unset($data['category_ids']);
         $data['user_id'] = Auth::id();
-        return $this->eventRepository->create($data);
+        $event = $this->eventRepository->create($data);
+        if ($categoryIds !== []) {
+            $event->categories()->sync($categoryIds);
+        }
+
+        return $event->load('categories');
     }
 
     /**
@@ -67,7 +74,19 @@ class EventService
      */
     public function updateEvent(int $eventId, array $data): ?Event
     {
-        return $this->eventRepository->update($eventId, $data);
+        $categoryIds = null;
+        if (array_key_exists('category_ids', $data)) {
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['category_ids']);
+        }
+        $event = $this->eventRepository->update($eventId, $data);
+        if ($event && $categoryIds !== null) {
+            $event->categories()->sync($categoryIds);
+
+            return $event->fresh(['categories']);
+        }
+
+        return $event ? $event->load('categories') : null;
     }
 
     /**
@@ -102,12 +121,31 @@ class EventService
 
     public function handleCalendarCreate(array $data): Event
     {
-        return $this->eventRepository->createFromCalendar($data);
+        $categoryIds = $data['category_ids'] ?? [];
+        unset($data['category_ids']);
+
+        $event = $this->eventRepository->createFromCalendar($data);
+        if ($categoryIds !== []) {
+            $event->categories()->sync($categoryIds);
+        }
+
+        return $event->load('categories');
     }
 
     public function handleCalendarUpdate(Event $event, array $data): Event
     {
-        return $this->eventRepository->updateFromCalendar($event, $data);
+        $categoryIds = null;
+        if (array_key_exists('category_ids', $data)) {
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['category_ids']);
+        }
+
+        $event = $this->eventRepository->updateFromCalendar($event, $data);
+        if ($categoryIds !== null) {
+            $event->categories()->sync($categoryIds);
+        }
+
+        return $event->load('categories');
     }
 
     public function handleCalendarDelete(Event $event): bool
