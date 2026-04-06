@@ -77,6 +77,35 @@ class EventCategoryWebTest extends TestCase
         $response->assertDontSee('Sadece B', false);
     }
 
+    public function test_events_index_filters_by_text_query(): void
+    {
+        $user = User::factory()->create();
+        Event::create([
+            'user_id' => $user->id,
+            'title' => 'Yıllık toplantı',
+            'description' => 'Genel kurul',
+            'start_date' => Carbon::parse('2026-06-01 10:00:00'),
+            'end_date' => Carbon::parse('2026-06-01 12:00:00'),
+            'location' => null,
+            'all_day' => false,
+        ]);
+        Event::create([
+            'user_id' => $user->id,
+            'title' => 'Spor',
+            'description' => 'Koşu',
+            'start_date' => Carbon::parse('2026-06-02 10:00:00'),
+            'end_date' => Carbon::parse('2026-06-02 11:00:00'),
+            'location' => null,
+            'all_day' => false,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('events.index', ['q' => 'kurul']));
+
+        $response->assertOk();
+        $response->assertSee('Yıllık toplantı', false);
+        $response->assertDontSee('Koşu', false);
+    }
+
     public function test_category_service_filters_foreign_ids(): void
     {
         $user = User::factory()->create();

@@ -22,6 +22,7 @@ class IndexEventFiltersRequest extends FormRequest
 
         return [
             'category_id' => $categoryRule,
+            'q' => ['nullable', 'string', 'max:200'],
         ];
     }
 }

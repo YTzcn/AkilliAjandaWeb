@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Repositories\EventRepository;
+use App\Support\RelationalTextSearch;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -29,9 +30,9 @@ class EventService
     }
 
     /**
-     * Web etkinlik listesi — isteğe bağlı kategori filtresi.
+     * Web etkinlik listesi — isteğe bağlı kategori ve metin araması (başlık + açıklama).
      */
-    public function getListingForWeb(?int $categoryId = null): Collection
+    public function getListingForWeb(?int $categoryId = null, ?string $searchQuery = null): Collection
     {
         $query = Event::query()
             ->where('user_id', Auth::id())
@@ -42,6 +43,10 @@ class EventService
             $query->whereHas('categories', function ($q) use ($categoryId) {
                 $q->where('categories.id', $categoryId);
             });
+        }
+
+        if ($searchQuery !== null && trim($searchQuery) !== '') {
+            RelationalTextSearch::apply($query, $searchQuery, ['title', 'description']);
         }
 
         return $query->get();

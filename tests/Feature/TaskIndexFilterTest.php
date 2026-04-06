@@ -71,4 +71,28 @@ class TaskIndexFilterTest extends TestCase
 
         $response->assertSessionHasErrors('sort');
     }
+
+    public function test_tasks_index_filters_by_text_query(): void
+    {
+        $user = User::factory()->create();
+        Task::factory()->create([
+            'user_id' => $user->id,
+            'title' => 'Alışveriş listesi',
+            'description' => 'Süt ve ekmek',
+            'due_date' => now()->addDay(),
+        ]);
+        Task::factory()->create([
+            'user_id' => $user->id,
+            'title' => 'Toplantı',
+            'description' => 'Haftalık sync',
+            'due_date' => now()->addDays(2),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('tasks.index', ['q' => 'ekmek']));
+
+        $response->assertOk();
+        $response->assertSee('Alışveriş listesi');
+        $response->assertDontSee('Toplantı');
+    }
 }
+

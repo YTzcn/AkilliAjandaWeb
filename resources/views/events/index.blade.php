@@ -23,7 +23,11 @@
     <div class="card mb-3">
         <div class="card-body py-3">
             <form method="get" action="{{ route('events.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-0">Arama</label>
+                    <input type="search" name="q" class="form-control form-control-sm" value="{{ $filters['q'] ?? '' }}" placeholder="Başlık veya notlarda ara">
+                </div>
+                <div class="col-md-3">
                     <label class="form-label small text-muted mb-0">Kategoriye göre</label>
                     <select name="category_id" class="form-select form-select-sm">
                         <option value="">Tümü</option>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth
+    <meta id="quick-search-endpoint" name="quick-search-endpoint" content="{{ route('search.quick') }}">
     <meta name="user-id" content="{{ auth()->id() }}">
     <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
     <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
@@ -82,7 +83,66 @@
             transform: translateY(-1px);
             box-shadow: 0 0.5rem 1rem rgba(65, 88, 208, 0.2);
         }
+        [x-cloak] { display: none !important; }
     </style>
+    @auth
+    <script>
+        window.createLayoutQuickSearch = function (searchUrl) {
+            return {
+                q: '',
+                open: false,
+                loading: false,
+                tasks: [],
+                events: [],
+                _timer: null,
+                url: searchUrl,
+                get hasAny() {
+                    return this.tasks.length > 0 || this.events.length > 0;
+                },
+                queueSearch() {
+                    this.open = true;
+                    clearTimeout(this._timer);
+                    this._timer = setTimeout(() => this.fetchResults(), 280);
+                },
+                async fetchResults() {
+                    const term = this.q.trim();
+                    if (term.length < 1) {
+                        this.tasks = [];
+                        this.events = [];
+                        this.loading = false;
+                        return;
+                    }
+                    this.loading = true;
+                    try {
+                        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                        const res = await fetch(this.url + '?q=' + encodeURIComponent(term), {
+                            headers: {
+                                Accept: 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': token,
+                            },
+                            credentials: 'same-origin',
+                        });
+                        if (!res.ok) {
+                            this.tasks = [];
+                            this.events = [];
+                            return;
+                        }
+                        const data = await res.json();
+                        this.tasks = data.tasks || [];
+                        this.events = data.events || [];
+                    } catch (e) {
+                        this.tasks = [];
+                        this.events = [];
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+            };
+        };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    @endauth
 </head>
 <body>
     <div class="container-fluid">
@@ -143,6 +203,55 @@
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4 main-content">
+                @auth
+                <div
+                    class="mb-3 pb-2 border-bottom"
+                    x-data="createLayoutQuickSearch((document.getElementById('quick-search-endpoint') && document.getElementById('quick-search-endpoint').getAttribute('content')) || '')"
+                    @click.outside="open = false"
+                >
+                    <label for="layout-global-search" class="form-label small text-muted mb-1">Görev ve etkinlik ara</label>
+                    <div class="position-relative" style="max-width: 32rem;">
+                        <input
+                            id="layout-global-search"
+                            type="search"
+                            class="form-control form-control-sm"
+                            placeholder="Örnek: toplantı, rapor…"
+                            autocomplete="off"
+                            x-model="q"
+                            @input="queueSearch()"
+                            @focus="open = true"
+                            @keydown.escape.window="open = false"
+                        >
+                        <div
+                            class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm py-2 px-0 small"
+                            style="z-index: 1050; max-height: 22rem; overflow-y: auto;"
+                            x-show="open && q.trim().length >= 1"
+                            x-cloak
+                        >
+                            <div x-show="loading" class="px-3 py-2 text-muted">Aranıyor…</div>
+                            <div x-show="!loading && !hasAny" class="px-3 py-2 text-muted">Sonuç yok</div>
+                            <div x-show="!loading && tasks.length > 0">
+                                <div class="px-3 text-uppercase text-muted fw-semibold" style="font-size: 0.65rem;">Görevler</div>
+                                <template x-for="row in tasks" :key="'t'+row.id">
+                                    <a :href="row.url" class="d-block px-3 py-1 text-decoration-none text-dark" @click="open=false">
+                                        <span x-text="row.title"></span>
+                                        <span class="text-muted" x-show="row.subtitle" x-text="' · '+row.subtitle"></span>
+                                    </a>
+                                </template>
+                            </div>
+                            <div x-show="!loading && events.length > 0" class="mt-2">
+                                <div class="px-3 text-uppercase text-muted fw-semibold" style="font-size: 0.65rem;">Etkinlikler</div>
+                                <template x-for="row in events" :key="'e'+row.id">
+                                    <a :href="row.url" class="d-block px-3 py-1 text-decoration-none text-dark" @click="open=false">
+                                        <span x-text="row.title"></span>
+                                        <span class="text-muted" x-show="row.subtitle" x-text="' · '+row.subtitle"></span>
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endauth
                 @yield('content')
             </div>
         </div>
@@ -150,7 +259,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     @yield('scripts')
 </body>
 </html> 

@@ -40,6 +40,7 @@ class TaskController extends Controller
             'due_to' => $validated['due_to'] ?? '',
             'due_date' => $validated['due_date'] ?? '',
             'category_id' => isset($validated['category_id']) ? (string) $validated['category_id'] : '',
+            'q' => isset($validated['q']) ? (string) $validated['q'] : '',
             'sort' => $normalized['sort'],
             'dir' => $normalized['dir'],
         ];

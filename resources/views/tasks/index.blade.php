@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@section('scripts')
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
-@endsection
-
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -27,6 +23,10 @@
                 x-ref="taskFilterForm"
                 @change="if ($event.target.closest('[data-auto-submit]')) { $refs.taskFilterForm.requestSubmit(); }"
             >
+                <div class="col-md-3" data-auto-submit>
+                    <label class="form-label small text-muted">Arama</label>
+                    <input type="search" name="q" class="form-control form-control-sm" value="{{ $filters['q'] ?? '' }}" placeholder="Başlık veya notlarda ara">
+                </div>
                 <div class="col-md-2" data-auto-submit>
                     <label class="form-label small text-muted">Durum</label>
                     <select name="status" class="form-select form-select-sm">

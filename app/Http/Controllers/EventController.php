@@ -25,10 +25,12 @@ class EventController extends Controller
     {
         $validated = $request->validated();
         $categoryId = isset($validated['category_id']) ? (int) $validated['category_id'] : null;
-        $events = $this->eventService->getListingForWeb($categoryId);
+        $q = isset($validated['q']) && is_string($validated['q']) ? trim($validated['q']) : null;
+        $events = $this->eventService->getListingForWeb($categoryId, $q !== '' ? $q : null);
         $categories = $this->categoryService->listForUser();
         $filters = [
             'category_id' => $categoryId !== null ? (string) $categoryId : '',
+            'q' => $q ?? '',
         ];
 
         return view('events.index', compact('events', 'categories', 'filters'));

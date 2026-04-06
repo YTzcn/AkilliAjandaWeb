@@ -17,7 +17,7 @@ class TaskListFilterNormalizer
     {
         $keys = [
             'status', 'priority', 'is_completed', 'due_from', 'due_to', 'due_date',
-            'category_id', 'sort', 'dir',
+            'category_id', 'sort', 'dir', 'q',
         ];
         $filters = [];
         foreach ($keys as $key) {

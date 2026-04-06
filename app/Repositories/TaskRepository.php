@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Task;
+use App\Support\RelationalTextSearch;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -74,6 +75,10 @@ class TaskRepository extends BaseRepository
             $query->whereHas('categories', function (Builder $q) use ($categoryId) {
                 $q->where('categories.id', $categoryId);
             });
+        }
+
+        if (! empty($filters['q']) && is_string($filters['q'])) {
+            RelationalTextSearch::apply($query, $filters['q'], ['title', 'description']);
         }
 
         $sort = $filters['sort'] ?? 'due_date';

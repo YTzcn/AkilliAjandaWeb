@@ -47,4 +47,11 @@ class TaskListFilterNormalizerTest extends TestCase
 
         $this->assertSame(3, $out['priority']);
     }
+
+    public function test_passes_text_search_query(): void
+    {
+        $out = TaskListFilterNormalizer::normalize(['q' => '  toplantı  ']);
+
+        $this->assertSame('  toplantı  ', $out['q']);
+    }
 }
