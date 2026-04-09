@@ -8,6 +8,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuickSearchController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,10 @@ Route::middleware(['ensure.auth'])->group(function () {
     Route::resource('categories', CategoryController::class)->only(['index', 'store', 'destroy']);
 
     Route::get('/search/quick', QuickSearchController::class)->name('search.quick');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export.csv', [ReportController::class, 'exportCsv'])->name('reports.export.csv');
+    Route::get('/reports/export.html', [ReportController::class, 'exportPrintable'])->name('reports.export.html');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

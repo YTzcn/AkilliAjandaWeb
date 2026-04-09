@@ -180,6 +180,12 @@
                                 Kategoriler
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                                Raporlar
+                            </a>
+                        </li>
                     </ul>
                     <hr>
                     <div class="dropdown">
