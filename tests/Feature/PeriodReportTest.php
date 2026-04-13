@@ -69,6 +69,26 @@ class PeriodReportTest extends TestCase
         $this->assertStringContainsString('CSV satırı', $raw);
     }
 
+    public function test_pdf_download_returns_pdf(): void
+    {
+        $user = User::factory()->create();
+        Task::factory()->create([
+            'user_id' => $user->id,
+            'title' => 'PDF satırı',
+            'due_date' => Carbon::parse('2026-08-01 10:00:00'),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('reports.export.pdf', [
+            'date_from' => '2026-08-01',
+            'date_to' => '2026-08-31',
+        ]));
+
+        $response->assertOk();
+        $type = strtolower((string) $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('application/pdf', $type);
+        $this->assertNotEmpty($response->getContent());
+    }
+
     public function test_printable_html_is_attachment(): void
     {
         $user = User::factory()->create();

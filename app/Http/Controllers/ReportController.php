@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PeriodReportRequest;
 use App\Services\PeriodReportService;
 use App\ViewModels\PeriodReportPresentation;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +61,22 @@ class ReportController extends Controller
             ])
             ->header('Content-Type', 'text/html; charset=UTF-8')
             ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
+    }
+
+    public function exportPdf(PeriodReportRequest $request): \Illuminate\Http\Response
+    {
+        [$from, $to] = $request->rangeBoundaries();
+        $report = $this->periodReportService->buildForUser((int) Auth::id(), $from, $to);
+
+        $filename = 'ajanda-raporu-'.$from->format('Y-m-d').'-'.$to->format('Y-m-d').'.pdf';
+
+        $pdf = Pdf::loadView('reports.period-print', [
+            'report' => $report,
+            'dateFrom' => $from->toDateString(),
+            'dateTo' => $to->toDateString(),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download($filename);
     }
 
     private static function writeCsv(PeriodReportPresentation $report, Carbon $from, Carbon $to): void

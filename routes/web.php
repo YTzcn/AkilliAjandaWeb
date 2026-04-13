@@ -48,6 +48,7 @@ Route::middleware(['ensure.auth'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export.csv', [ReportController::class, 'exportCsv'])->name('reports.export.csv');
     Route::get('/reports/export.html', [ReportController::class, 'exportPrintable'])->name('reports.export.html');
+    Route::get('/reports/export.pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

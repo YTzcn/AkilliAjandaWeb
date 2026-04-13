@@ -549,12 +549,15 @@
             <p class="report-hero__eyebrow">Özet · Dönem analizi</p>
             <h1>Dönem raporu</h1>
             <p class="report-hero__lead">
-                Seçtiğin aralıkta <strong>son tarihi</strong> bu pencereye düşen görevler ve takviminde <strong>kesişen</strong> etkinlikler bir arada. PDF için
-                <strong>Yazdırılabilir rapor</strong> dosyasını açıp tarayıcıda <em>Yazdır → PDF olarak kaydet</em> kullanabilirsin.
+                Seçtiğin aralıkta <strong>son tarihi</strong> bu pencereye düşen görevler ve takviminde <strong>kesişen</strong> etkinlikler bir arada.
+                PDF indir veya <strong>yazdırılabilir raporu</strong> açıp tarayıcıda <em>Yazdır → PDF olarak kaydet</em> kullanabilirsin.
             </p>
             <div class="report-hero__actions">
                 <a href="{{ route('reports.export.csv', request()->only(['date_from', 'date_to'])) }}" class="report-btn report-btn--primary">
                     <i class="bi bi-filetype-csv"></i> CSV indir
+                </a>
+                <a href="{{ route('reports.export.pdf', request()->only(['date_from', 'date_to'])) }}" class="report-btn report-btn--primary">
+                    <i class="bi bi-filetype-pdf"></i> PDF indir
                 </a>
                 <a href="{{ route('reports.export.html', request()->only(['date_from', 'date_to'])) }}" class="report-btn report-btn--ghost">
                     <i class="bi bi-printer"></i> Yazdırılabilir rapor
