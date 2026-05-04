@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Event;
+use App\Support\CalendarQueryWindow;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -36,17 +37,23 @@ class EventRepository extends BaseRepository
     public function getForCalendar(array $filters = []): Collection
     {
         $query = $this->model->query()
-            ->where('user_id', Auth::id());
+            ->where('user_id', Auth::id())
+            ->select([
+                'id', 'user_id', 'title', 'start_date', 'end_date', 'description', 'location', 'all_day',
+            ])
+            ->with(['categories:id,name,color']);
 
-        if (isset($filters['start'])) {
-            $query->where('start_date', '>=', $filters['start']);
+        $window = CalendarQueryWindow::fromRequest(
+            isset($filters['start']) ? (string) $filters['start'] : null,
+            isset($filters['end']) ? (string) $filters['end'] : null,
+        );
+
+        if ($window !== null) {
+            $query->where('start_date', '<=', $window['end'])
+                ->where('end_date', '>=', $window['start']);
         }
 
-        if (isset($filters['end'])) {
-            $query->where('end_date', '<=', $filters['end']);
-        }
-
-        return $query->get();
+        return $query->orderBy('start_date')->get();
     }
 
     public function createFromCalendar(array $data): Event

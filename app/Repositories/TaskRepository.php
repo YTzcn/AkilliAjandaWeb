@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Task;
+use App\Support\CalendarQueryWindow;
 use App\Support\RelationalTextSearch;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -197,13 +198,20 @@ class TaskRepository extends BaseRepository
      */
     public function getForCalendar(array $filters = []): Collection
     {
-        $query = $this->model->where('user_id', Auth::id());
+        $query = $this->model
+            ->query()
+            ->where('user_id', Auth::id())
+            ->select([
+                'id', 'user_id', 'title', 'due_date', 'description', 'status', 'priority', 'is_completed',
+            ]);
 
-        if (isset($filters['start']) && isset($filters['end'])) {
-            $startDate = Carbon::parse($filters['start']);
-            $endDate = Carbon::parse($filters['end']);
+        $window = CalendarQueryWindow::fromRequest(
+            isset($filters['start']) ? (string) $filters['start'] : null,
+            isset($filters['end']) ? (string) $filters['end'] : null,
+        );
 
-            $query->whereBetween('due_date', [$startDate, $endDate]);
+        if ($window !== null) {
+            $query->whereBetween('due_date', [$window['start'], $window['end']]);
         }
 
         return $query->orderBy('due_date')->get();
