@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Event;
 use App\Models\Task;
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'demo@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
         ]);
 
         // Bugünün tarihini al
@@ -107,6 +108,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test Kullanıcı',
             'email' => 'test@example.com',
             'password' => Hash::make('123456'),
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
         ]);
     }
 

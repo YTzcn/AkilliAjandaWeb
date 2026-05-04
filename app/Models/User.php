@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'email_verification_code',
         'email_verification_code_expires_at',
+        'onboarding_completed_at',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'email_verification_code_expires_at' => 'datetime',
+            'onboarding_completed_at' => 'datetime',
         ];
     }
 

@@ -88,7 +88,9 @@
             background-color: #4158d0;
             border-color: #4158d0;
         }
+        [x-cloak] { display: none !important; }
     </style>
+    @stack('styles')
 </head>
 <body>
     <div class="auth-wrapper">
@@ -140,5 +142,6 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
 </html> 

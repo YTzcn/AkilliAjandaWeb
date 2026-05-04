@@ -53,12 +53,16 @@
             padding: 0.8rem 1rem;
             margin: 0.2rem 0;
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
+            transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
         }
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
             color: white;
             background: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar .nav-link:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.95);
+            outline-offset: 2px;
         }
         .main-content {
             min-height: 100vh;
@@ -145,6 +149,7 @@
     @endauth
 </head>
 <body>
+    <a href="#main-content" class="visually-hidden-focusable btn btn-sm btn-light position-fixed top-0 start-0 m-2 shadow-sm" style="z-index: 1080;">Ana içeriğe atla</a>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -186,6 +191,12 @@
                                 Raporlar
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('help.index') }}" class="nav-link {{ request()->routeIs('help.*') ? 'active' : '' }}">
+                                <i class="bi bi-question-circle me-2"></i>
+                                Yardım
+                            </a>
+                        </li>
                     </ul>
                     <hr>
                     <div class="dropdown">
@@ -208,7 +219,7 @@
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4 main-content">
+            <div id="main-content" tabindex="-1" class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4 main-content">
                 @auth
                 <div
                     class="mb-3 pb-2 border-bottom"
@@ -259,6 +270,11 @@
                 </div>
                 @endauth
                 @yield('content')
+                @auth
+                <footer class="mt-5 pt-3 border-top small" role="contentinfo">
+                    <a href="{{ route('help.index') }}" class="text-decoration-none text-secondary">Yardım merkezi</a>
+                </footer>
+                @endauth
             </div>
         </div>
     </div>
