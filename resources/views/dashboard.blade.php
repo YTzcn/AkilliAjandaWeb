@@ -911,7 +911,7 @@ document.addEventListener('DOMContentLoaded', function() {
             month: 'Ay',
             week: 'Hafta'
         },
-        dayMaxEventRows: false, // Tüm etkinlikleri göster
+        dayMaxEventRows: 4, // Yoğun günlerde DOM / boyama maliyetini sınırla (+more)
         selectable: true,
         editable: true,
         events: function(info, successCallback, failureCallback) {
