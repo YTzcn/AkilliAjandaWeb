@@ -36,6 +36,7 @@ class IndexTaskFiltersRequest extends FormRequest
             'due_date' => ['nullable', 'date'],
             'category_id' => $categoryRule,
             'q' => ['nullable', 'string', 'max:200'],
+            'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
             'sort' => ['nullable', 'string', Rule::in(['due_date', 'priority', 'created_at', 'title', 'status'])],
             'dir' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
         ];

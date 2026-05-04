@@ -72,6 +72,31 @@ class TaskIndexFilterTest extends TestCase
         $response->assertSessionHasErrors('sort');
     }
 
+    public function test_tasks_index_rejects_per_page_out_of_range(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('tasks.index', ['per_page' => 200]))
+            ->assertSessionHasErrors('per_page');
+    }
+
+    public function test_tasks_index_paginates_with_per_page(): void
+    {
+        $user = User::factory()->create();
+        foreach (range(1, 12) as $i) {
+            Task::factory()->create([
+                'user_id' => $user->id,
+                'title' => 'Görev '.$i,
+                'due_date' => now()->addDays($i),
+            ]);
+        }
+
+        $response = $this->actingAs($user)->get(route('tasks.index', ['per_page' => 10]));
+        $response->assertOk();
+        $response->assertSee('Görev 1');
+        $response->assertDontSee('Görev 11');
+        $response->assertSee('page=2', false);
+    }
+
     public function test_tasks_index_filters_by_text_query(): void
     {
         $user = User::factory()->create();

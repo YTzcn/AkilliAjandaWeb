@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\IndexTaskFiltersRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
-use App\Support\TaskListFilterNormalizer;
 use App\Services\CategoryService;
 use App\Services\TaskService;
+use App\Support\TaskListFilterNormalizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -23,13 +23,18 @@ class TaskController extends Controller
 
     /**
      * Display a listing of the tasks.
-     *
-     * @return View
      */
     public function index(IndexTaskFiltersRequest $request): View
     {
         $validated = $request->validated();
-        $tasks = $this->taskService->getFilteredTasks($validated);
+        $perPage = (int) ($validated['per_page'] ?? 25);
+        if ($perPage < 5) {
+            $perPage = 5;
+        }
+        if ($perPage > 100) {
+            $perPage = 100;
+        }
+        $tasks = $this->taskService->getFilteredTasksPaginated($validated, $perPage);
         $normalized = TaskListFilterNormalizer::normalize($validated);
         $filters = [
             'status' => $validated['status'] ?? '',
@@ -43,16 +48,19 @@ class TaskController extends Controller
             'q' => isset($validated['q']) ? (string) $validated['q'] : '',
             'sort' => $normalized['sort'],
             'dir' => $normalized['dir'],
+            'per_page' => (string) $perPage,
         ];
         $categories = $this->categoryService->listForUser();
 
-        return view('tasks.index', compact('tasks', 'categories', 'filters'));
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            'categories' => $categories,
+            'filters' => $filters,
+        ]);
     }
 
     /**
      * Show the form for creating a new task.
-     *
-     * @return View
      */
     public function create(): View
     {
@@ -63,33 +71,26 @@ class TaskController extends Controller
 
     /**
      * Store a newly created task in storage.
-     *
-     * @param StoreTaskRequest $request
-     * @return RedirectResponse
      */
     public function store(StoreTaskRequest $request): RedirectResponse
     {
         $this->taskService->createTask($request->validated());
+
         return redirect()->route('tasks.index')->with('success', 'Görev başarıyla oluşturuldu.');
     }
 
     /**
      * Display the specified task.
-     *
-     * @param int $id
-     * @return View
      */
     public function show(int $id): View
     {
         $task = $this->taskService->getTaskById($id);
+
         return view('tasks.show', compact('task'));
     }
 
     /**
      * Show the form for editing the specified task.
-     *
-     * @param int $id
-     * @return View
      */
     public function edit(int $id): View
     {
@@ -101,50 +102,41 @@ class TaskController extends Controller
 
     /**
      * Update the specified task in storage.
-     *
-     * @param UpdateTaskRequest $request
-     * @param int $id
-     * @return RedirectResponse
      */
     public function update(UpdateTaskRequest $request, int $id): RedirectResponse
     {
         $this->taskService->updateTask($id, $request->validated());
+
         return redirect()->route('tasks.index')->with('success', 'Görev başarıyla güncellendi.');
     }
 
     /**
      * Remove the specified task from storage.
-     *
-     * @param int $id
-     * @return RedirectResponse
      */
     public function destroy(int $id): RedirectResponse
     {
         $this->taskService->deleteTask($id);
+
         return redirect()->route('tasks.index')->with('success', 'Görev başarıyla silindi.');
     }
 
     /**
      * Mark the task as completed.
-     *
-     * @param int $id
-     * @return RedirectResponse
      */
     public function complete(int $id): RedirectResponse
     {
         $this->taskService->markAsCompleted($id);
+
         return redirect()->route('tasks.index')->with('success', 'Görev tamamlandı olarak işaretlendi.');
     }
 
     /**
      * Mark the task as pending.
-     *
-     * @param int $id
-     * @return RedirectResponse
      */
     public function pending(int $id): RedirectResponse
     {
         $this->taskService->markAsPending($id);
+
         return redirect()->route('tasks.index')->with('success', 'Görev beklemede olarak işaretlendi.');
     }
-} 
+}

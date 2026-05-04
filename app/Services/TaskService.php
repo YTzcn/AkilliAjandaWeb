@@ -7,6 +7,7 @@ use App\Repositories\TaskRepository;
 use App\Support\TaskListFilterNormalizer;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class TaskService
@@ -18,8 +19,6 @@ class TaskService
 
     /**
      * TaskService constructor.
-     *
-     * @param TaskRepository $taskRepository
      */
     public function __construct(
         TaskRepository $taskRepository,
@@ -30,8 +29,6 @@ class TaskService
 
     /**
      * Get all tasks for the authenticated user.
-     *
-     * @return Collection
      */
     public function getAllTasks(): Collection
     {
@@ -48,6 +45,18 @@ class TaskService
         $normalized = TaskListFilterNormalizer::normalize($filters);
 
         return $this->taskRepository->filteredForUser(Auth::id(), $normalized);
+    }
+
+    /**
+     * Web görev listesi: doğrulanmış sayfa boyutu ile sayfalandırma.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    public function getFilteredTasksPaginated(array $filters, int $perPage): LengthAwarePaginator
+    {
+        $normalized = TaskListFilterNormalizer::normalize($filters);
+
+        return $this->taskRepository->filteredForUserPaginated(Auth::id(), $normalized, $perPage);
     }
 
     /**
@@ -106,8 +115,6 @@ class TaskService
 
     /**
      * Get pending tasks for the authenticated user.
-     *
-     * @return Collection
      */
     public function getPendingTasks(): Collection
     {
@@ -116,8 +123,6 @@ class TaskService
 
     /**
      * Get completed tasks for the authenticated user.
-     *
-     * @return Collection
      */
     public function getCompletedTasks(): Collection
     {
@@ -126,9 +131,6 @@ class TaskService
 
     /**
      * Get tasks by priority level for the authenticated user.
-     *
-     * @param int $level
-     * @return Collection
      */
     public function getTasksByPriority(int $level): Collection
     {
@@ -137,8 +139,6 @@ class TaskService
 
     /**
      * Get tasks due today for the authenticated user.
-     *
-     * @return Collection
      */
     public function getTasksDueToday(): Collection
     {
@@ -147,8 +147,6 @@ class TaskService
 
     /**
      * Get overdue tasks for the authenticated user.
-     *
-     * @return Collection
      */
     public function getOverdueTasks(): Collection
     {
@@ -157,9 +155,6 @@ class TaskService
 
     /**
      * Create a new task.
-     *
-     * @param array $data
-     * @return Task
      */
     public function createTask(array $data): Task
     {
@@ -177,10 +172,6 @@ class TaskService
 
     /**
      * Update an existing task.
-     *
-     * @param int $taskId
-     * @param array $data
-     * @return Task|null
      */
     public function updateTask(int $taskId, array $data): ?Task
     {
@@ -201,9 +192,6 @@ class TaskService
 
     /**
      * Delete a task.
-     *
-     * @param int $taskId
-     * @return bool
      */
     public function deleteTask(int $taskId): bool
     {
@@ -212,9 +200,6 @@ class TaskService
 
     /**
      * Get a specific task by ID.
-     *
-     * @param int $taskId
-     * @return Task|null
      */
     public function getTaskById(int $taskId): ?Task
     {
@@ -226,9 +211,6 @@ class TaskService
 
     /**
      * Mark task as completed.
-     *
-     * @param int $taskId
-     * @return bool
      */
     public function markAsCompleted(int $taskId): bool
     {
@@ -237,9 +219,6 @@ class TaskService
 
     /**
      * Mark task as pending.
-     *
-     * @param int $taskId
-     * @return bool
      */
     public function markAsPending(int $taskId): bool
     {
@@ -249,6 +228,7 @@ class TaskService
     public function getCalendarTasks(array $filters = []): array
     {
         $tasks = $this->taskRepository->getForCalendar($filters);
+
         return $tasks->map(function ($task) {
             return $this->formatForCalendar($task);
         })->toArray();
@@ -273,4 +253,4 @@ class TaskService
     {
         return $this->taskRepository->formatForCalendar($task);
     }
-} 
+}

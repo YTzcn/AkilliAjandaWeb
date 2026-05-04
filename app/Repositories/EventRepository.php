@@ -11,8 +11,6 @@ class EventRepository extends BaseRepository
 {
     /**
      * EventRepository constructor.
-     *
-     * @param Event $model
      */
     public function __construct(Event $model)
     {
@@ -21,16 +19,13 @@ class EventRepository extends BaseRepository
 
     /**
      * Get events between start and end dates for a user.
-     *
-     * @param string $startDate
-     * @param string $endDate
-     * @return Collection
      */
     public function getEventsBetweenDates(string $startDate, string $endDate): Collection
     {
         return $this->model
             ->where('user_id', Auth::id())
-            ->where(function($query) use ($startDate, $endDate) {
+            ->with(['categories'])
+            ->where(function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('start_date', [$startDate, $endDate])
                     ->orWhereBetween('end_date', [$startDate, $endDate]);
             })
@@ -58,7 +53,7 @@ class EventRepository extends BaseRepository
     {
         $data['user_id'] = Auth::id();
         $data['all_day'] = $data['all_day'] ?? false;
-        
+
         // Tarihleri UTC'ye çevir
         $data['start_date'] = Carbon::parse($data['start_date']);
         $data['end_date'] = Carbon::parse($data['end_date']);
@@ -72,8 +67,9 @@ class EventRepository extends BaseRepository
         if (count($data) === 2 && isset($data['start_date']) && isset($data['end_date'])) {
             $event->update([
                 'start_date' => Carbon::parse($data['start_date']),
-                'end_date' => Carbon::parse($data['end_date'])
+                'end_date' => Carbon::parse($data['end_date']),
             ]);
+
             return $event;
         }
 
@@ -86,6 +82,7 @@ class EventRepository extends BaseRepository
         }
 
         $event->update($data);
+
         return $event;
     }
 
@@ -106,8 +103,8 @@ class EventRepository extends BaseRepository
             'allDay' => $event->all_day,
             'className' => 'calendar-event',
             'extendedProps' => [
-                'type' => 'event'
-            ]
+                'type' => 'event',
+            ],
         ];
     }
-} 
+}

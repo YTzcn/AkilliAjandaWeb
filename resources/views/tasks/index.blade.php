@@ -93,6 +93,14 @@
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary btn-sm w-100">Filtrele</button>
                 </div>
+                <div class="col-md-2" data-auto-submit>
+                    <label class="form-label small text-muted">Sayfa boyutu</label>
+                    <select name="per_page" class="form-select form-select-sm">
+                        @foreach([10, 15, 25, 50] as $n)
+                            <option value="{{ $n }}" @selected(($filters['per_page'] ?? '25') == (string) $n)>{{ $n }} / sayfa</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="col-md-2">
                     <a href="{{ route('tasks.index') }}" class="btn btn-outline-secondary btn-sm w-100">Sıfırla</a>
                 </div>
@@ -144,6 +152,11 @@
                 </tbody>
             </table>
         </div>
+        @if($tasks->hasPages())
+            <div class="card-footer py-3 d-flex justify-content-center">
+                {{ $tasks->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection
