@@ -64,6 +64,12 @@
             outline: 2px solid rgba(255, 255, 255, 0.95);
             outline-offset: 2px;
         }
+        .main-content .btn:focus-visible,
+        .main-content .form-control:focus-visible,
+        .main-content .form-select:focus-visible {
+            outline: 2px solid #4158d0;
+            outline-offset: 2px;
+        }
         .main-content {
             min-height: 100vh;
         }
@@ -281,6 +287,31 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    @auth
+    @if(session('success') || session('status') || session('error'))
+        @php
+            $layoutFlashMessage = session('error') ?? session('success') ?? session('status');
+            $layoutFlashIcon = session('error') ? 'error' : 'success';
+        @endphp
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof Swal === 'undefined') {
+                    return;
+                }
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: @json($layoutFlashIcon),
+                    title: @json($layoutFlashMessage),
+                    showConfirmButton: false,
+                    timer: 4200,
+                    timerProgressBar: true,
+                });
+            });
+        </script>
+    @endif
+    @endauth
 
     @yield('scripts')
 </body>

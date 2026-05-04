@@ -450,6 +450,34 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-5px); }
     }
+
+    .calendar-mount {
+        position: relative;
+        min-height: 28rem;
+    }
+    #calendar-skeleton {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 1.5rem;
+    }
+    #calendar-skeleton .sk-line {
+        height: 0.65rem;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #e9ecef, #f8f9fa, #e9ecef);
+        background-size: 200% 100%;
+        animation: sk-shimmer 1.1s ease-in-out infinite;
+    }
+    @keyframes sk-shimmer {
+        0% { background-position: 100% 0; }
+        100% { background-position: -100% 0; }
+    }
 </style>
 @endsection
 
@@ -475,7 +503,15 @@
     <div class="dashboard-container">
         <!-- Takvim -->
         <div class="calendar-container">
-            <div id="calendar"></div>
+            <div class="calendar-mount">
+                <div id="calendar-skeleton" aria-busy="true" aria-label="Takvim yükleniyor">
+                    <div class="sk-line" style="width: 55%;"></div>
+                    <div class="sk-line" style="width: 80%;"></div>
+                    <div class="sk-line" style="width: 70%;"></div>
+                    <p class="small text-muted mb-0 mt-2">Etkinlikler yükleniyor…</p>
+                </div>
+                <div id="calendar"></div>
+            </div>
         </div>
 
         <!-- Sağ Bölüm -->
@@ -864,6 +900,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initialView: 'dayGridMonth',
         locale: 'tr',
         height: '100%',
+        lazyFetching: true,
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
@@ -901,10 +938,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }).then(response => response.json())
             ])
             .then(([events, tasks]) => {
+                const sk = document.getElementById('calendar-skeleton');
+                if (sk) {
+                    sk.style.display = 'none';
+                    sk.setAttribute('aria-hidden', 'true');
+                }
                 successCallback([...events, ...tasks]);
             })
             .catch(error => {
                 console.error('Error fetching calendar items:', error);
+                const sk = document.getElementById('calendar-skeleton');
+                if (sk) {
+                    sk.innerHTML = '<p class="text-danger small px-3 text-center">Takvim verisi yüklenemedi. Sayfayı yenileyin.</p>';
+                }
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Takvim yüklenemedi', showConfirmButton: false, timer: 5000 });
+                }
                 failureCallback(error);
             });
         },
