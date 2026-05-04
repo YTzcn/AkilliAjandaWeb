@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}">
+    <form id="login-form" method="POST" action="{{ route('login') }}">
         @csrf
 
         <!-- Email Address -->
@@ -68,4 +68,28 @@
             </a>
         </p>
     </div>
-@endsection 
+
+    @push('scripts')
+        <script>
+            (function () {
+                var form = document.getElementById('login-form');
+                if (!form) return;
+                form.addEventListener('keydown', function (e) {
+                    if (e.key !== 'Enter') return;
+                    if (e.defaultPrevented) return;
+                    var t = e.target;
+                    if (!t || t.form !== form) return;
+                    if (t.tagName === 'BUTTON' || t.type === 'checkbox') return;
+                    if (t.tagName === 'A') return;
+                    e.preventDefault();
+                    var submitBtn = form.querySelector('button[type="submit"]');
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit(submitBtn);
+                    } else {
+                        form.submit();
+                    }
+                });
+            })();
+        </script>
+    @endpush
+@endsection

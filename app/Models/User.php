@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -90,8 +91,18 @@ class User extends Authenticatable
      */
     public function markEmailAsVerified(): bool
     {
-        return $this->forceFill([
+        if ($this->hasVerifiedEmail()) {
+            return false;
+        }
+
+        if ($this->forceFill([
             'email_verified_at' => now(),
-        ])->save();
+        ])->save()) {
+            event(new Verified($this));
+
+            return true;
+        }
+
+        return false;
     }
 }
