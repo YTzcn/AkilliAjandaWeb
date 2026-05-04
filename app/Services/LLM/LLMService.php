@@ -75,7 +75,7 @@ class LLMService
     }
     
     /**
-     * Kullanıcı mesajını işler ve yanıt verir
+     * Kullanıcı mesajını ReAct döngüsü ile işler ve yanıt verir
      * 
      * @param string $message Kullanıcı mesajı
      * @return string Yanıt
@@ -83,145 +83,186 @@ class LLMService
     public function processUserMessage(string $message): string
     {
         $requestId = uniqid('llm_');
-        Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] Yeni istek başladı", [
+        $maxIterations = 5;
+        $iteration = 0;
+        $scratchpad = []; // Mevcut döngüdeki Thought, Action, Observation geçmişi
+        
+        Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] ReAct döngüsü başladı", [
             'message' => $message,
             'provider' => get_class($this->provider)
         ]);
 
         try {
-            // Mesajı LLM ile analiz et
-            Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] Provider analizi başladı");
-            $analysis = $this->provider->processMessage($message);
-            Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] Provider analizi tamamlandı", [
-                'type' => $analysis['type'] ?? 'unknown',
-                'data' => $analysis['data'] ?? []
-            ]);
-            
-            // Görev güncelleme işlemi için task_id kontrolü
-            if (($analysis['type'] ?? '') === 'gorev_guncelleme' && (!isset($analysis['data']['task_id']) || empty($analysis['data']['task_id']))) {
-                // Task ID eksikse, son kullanıcı mesajından task ID çıkarmayı dene
-                $taskId = $this->extractTaskIdFromMessage($message);
-                if ($taskId) {
-                    $analysis['data']['task_id'] = $taskId;
-                    Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] Mesajdan task_id çıkarıldı", [
-                        'task_id' => $taskId
-                    ]);
-                } else {
-                    // Kullanıcıya görev ID'sini belirtmesi gerektiğini bildir
-                    return 'Görev güncellemek için görev ID bilgisi eksik. Lütfen güncellemek istediğiniz görevin numarasını belirtin.';
+            // 1. Konuşma geçmişini getir (Son 5 mesaj)
+            $history = Message::where('user_id', auth()->id() ?? 1)
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->reverse()
+                ->map(function($msg) {
+                    return [
+                        'user' => $msg->user_message,
+                        'assistant' => $msg->ai_response
+                    ];
+                })->toArray();
+
+            while ($iteration < $maxIterations) {
+                $iteration++;
+                
+                // 2. Prompt oluştur
+                $prompt = $this->buildReActPrompt($message, $history, $scratchpad);
+                
+                // 3. LLM'den yanıt al
+                Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] İterasyon {$iteration} başladı");
+                $analysis = $this->provider->processMessage($prompt);
+                
+                $thought = $analysis['thought'] ?? 'Düşünülüyor...';
+                $action = $analysis['action'] ?? 'final_answer';
+                $actionInput = $analysis['action_input'] ?? [];
+
+                Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] LLM Kararı", [
+                    'thought' => $thought,
+                    'action' => $action,
+                    'input' => $actionInput
+                ]);
+
+                // 4. Eğer nihai yanıt ise döngüden çık
+                if ($action === 'final_answer' || $action === 'sohbet') {
+                    if (is_array($actionInput)) {
+                        $finalResult = $actionInput['message'] ?? 
+                                      $actionInput['mesaj'] ?? 
+                                      $actionInput['text'] ?? 
+                                      $actionInput['response'] ?? 
+                                      $actionInput['answer'] ?? 
+                                      (count($actionInput) === 1 ? reset($actionInput) : json_encode($actionInput, JSON_UNESCAPED_UNICODE));
+                    } else {
+                        $finalResult = $actionInput;
+                    }
+                    break;
                 }
+
+                // 5. Aracı yürüt
+                $observation = $this->executeTool($requestId, $action, $actionInput);
+                
+                // 6. Scratchpad'e ekle
+                $scratchpad[] = [
+                    'thought' => $thought,
+                    'action' => $action,
+                    'action_input' => $actionInput,
+                    'observation' => $observation
+                ];
+                
+                Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] Gözlem", ['observation' => $observation]);
             }
-            
-            // İşlem türüne göre uygun fonksiyonu çağır
-            $result = match($analysis['type']) {
-                'takvim_sorgulama' => $this->loggedMethod($requestId, 'handleCalendarQuery', fn() => $this->handleCalendarQuery($analysis['data'])),
-                'takvim_ozet' => $this->loggedMethod($requestId, 'handleCalendarSummary', fn() => $this->handleCalendarSummary($analysis['data'])),
-                'yeni_etkinlik' => $this->loggedMethod($requestId, 'handleNewEvent', fn() => $this->eventHandler->handleNewEvent($analysis['data'])),
-                'yeni_görev' => $this->loggedMethod($requestId, 'handleNewTask', fn() => $this->taskHandler->handleNewTask($analysis['data'])),
-                'gorev_guncelleme' => $this->loggedMethod($requestId, 'handleUpdateRequest', fn() => $this->handleUpdateRequest($analysis['data'], 'task')),
-                'etkinlik_guncelleme' => $this->loggedMethod($requestId, 'handleUpdateRequest', fn() => $this->handleUpdateRequest($analysis['data'], 'event')),
-                'ozet_bilgi' => $this->loggedMethod($requestId, 'handleSummaryRequest', fn() => $this->eventHandler->handleSummaryRequest($analysis['data'], $this->provider)),
-                'sohbet' => $analysis['data']['message'] ?? 'Üzgünüm, sizi anlayamadım. Ajandanızla ilgili nasıl yardımcı olabilirim?',
-                default => 'Üzgünüm, mesajınızı anlayamadım. Ajandanızla ilgili nasıl yardımcı olabilirim?'
-            };
 
-            // Mesajı veritabanına kaydet
-            Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] Mesaj kaydediliyor", [
-                'user_id' => auth()->id() ?? 1,
-                'message_type' => $analysis['type'],
-                'is_successful' => true
-            ]);
+            $result = $finalResult ?? 'Üzgünüm, işleminizi tamamlayamadım. Lütfen tekrar dener misiniz?';
 
+            // 7. Mesajı veritabanına kaydet
             Message::create([
                 'user_id' => auth()->id() ?? 1,
                 'user_message' => $message,
                 'ai_response' => $result,
-                'ai_analysis' => $analysis,
-                'message_type' => $analysis['type'],
-                'processed_data' => $analysis['data'],
+                'ai_analysis' => [
+                    'iterations' => $iteration,
+                    'scratchpad' => $scratchpad,
+                    'final_analysis' => $analysis
+                ],
+                'message_type' => $analysis['action'] ?? 'react_completion',
+                'processed_data' => $scratchpad,
                 'model_used' => $this->provider->getDefaultModel(),
-                'is_successful' => true,
-                'error_message' => null
+                'is_successful' => true
             ]);
 
-            Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] İşlem başarıyla tamamlandı");
             return $result;
+
         } catch (Exception $e) {
-            Log::channel(self::LOG_CHANNEL)->error("[{$requestId}] Hata oluştu", [
+            Log::channel(self::LOG_CHANNEL)->error("[{$requestId}] ReAct hatası", [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // Hata durumunda mesajı kaydet
             Message::create([
                 'user_id' => auth()->id() ?? 1,
                 'user_message' => $message,
-                'ai_response' => 'Merhaba! Şu anda teknik bir sorun yaşıyorum. Ajandanızla ilgili nasıl yardımcı olabilirim?',
-                'ai_analysis' => null,
-                'message_type' => 'error',
-                'processed_data' => null,
-                'model_used' => $this->provider->getDefaultModel(),
+                'ai_response' => 'Şu anda teknik bir sorun yaşıyorum.',
                 'is_successful' => false,
                 'error_message' => $e->getMessage()
             ]);
 
-            return 'Merhaba! Şu anda teknik bir sorun yaşıyorum. Ajandanızla ilgili nasıl yardımcı olabilirim?';
+            return 'Şu anda teknik bir sorun yaşıyorum. Lütfen biraz sonra tekrar deneyin.';
         }
     }
-    
+
     /**
-     * Kullanıcı mesajından Task ID'yi çıkarmaya çalışır
-     * 
-     * @param string $message Kullanıcı mesajı
-     * @return int|null Bulunan Task ID veya null
+     * ReAct prompt'unu inşa eder
      */
-    private function extractTaskIdFromMessage(string $message): ?int
+    protected function buildReActPrompt(string $message, array $history, array $scratchpad): string
     {
-        // Görev ID'si için olası desenler
-        $patterns = [
-            '/görev\s*#?(\d+)/i',         // "görev #5" veya "görev 5"
-            '/görev\s*id\s*:?\s*(\d+)/i', // "görev id: 5" veya "görev id 5"
-            '/görev\s*numarası\s*:?\s*(\d+)/i', // "görev numarası: 5"
-            '/id\s*:?\s*(\d+)/i',         // "id: 5" veya "id 5"
-            '/numara\s*:?\s*(\d+)/i',     // "numara: 5"
-            '/no\s*:?\s*(\d+)/i',         // "no: 5"
-            '/#(\d+)/i',                  // "#5"
-            '/(\d+)\s*numaralı\s*görev/i', // "5 numaralı görev"
-            '/(\d+)\s*nolu\s*görev/i',    // "5 nolu görev"
-            '/(\d+)\s*no\'?lu\s*görev/i'  // "5 no'lu görev" veya "5 nolu görev"
-        ];
+        $currentDate = Carbon::now()->format('Y-m-d H:i:s');
         
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $message, $matches)) {
-                return (int)$matches[1];
+        $tools = [
+            'takvim_sorgulama' => 'Belirli bir tarih aralığındaki etkinlik ve görevleri listeler. Parametreler: start_date, end_date (YYYY-MM-DD HH:MM:SS), content_type (events, tasks, both)',
+            'takvim_ozet' => 'Bugün veya yarın için genel plan özeti verir. Parametreler: period (today, tomorrow)',
+            'yeni_etkinlik' => 'Yeni bir takvim etkinliği oluşturur. Parametreler: title, start_date, end_date, description, location',
+            'yeni_görev' => 'Yeni bir görev ekler. Parametreler: title, due_date, description, priority (1:düşük, 2:orta, 3:yüksek)',
+            'gorev_guncelleme' => 'Mevcut bir görevi günceller. Parametreler: task_id (zorunlu), title, status (pending, in_progress, completed, cancelled), priority',
+            'etkinlik_guncelleme' => 'Mevcut bir etkinliği günceller. Parametreler: event_id (zorunlu), title, start_date, end_date, location',
+            'ozet_bilgi' => 'Kullanıcının ajandası hakkında genel istatistiksel bilgi verir.'
+        ];
+
+        $prompt = "Sen bir Akıllı Ajanda Uygulamasının yetenekli asistanısın. ReAct (Thought -> Action -> Observation) döngüsünü kullanarak kullanıcı isteklerini yerine getirirsin.\n\n";
+        $prompt .= "Şu anki tarih ve saat: {$currentDate}\n\n";
+        
+        $prompt .= "Kullanabileceğin Araçlar:\n";
+        foreach ($tools as $name => $desc) {
+            $prompt .= "- {$name}: {$desc}\n";
+        }
+        $prompt .= "- final_answer: Kullanıcıya nihai cevabı vermek için kullanılır. Parametre: { \"message\": \"kullanıcıya verilecek yanıt\" }\n\n";
+
+        if (!empty($history)) {
+            $prompt .= "Önceki Konuşmalar:\n";
+            foreach ($history as $h) {
+                $prompt .= "Kullanıcı: {$h['user']}\nAsistan: {$h['assistant']}\n";
+            }
+            $prompt .= "\n";
+        }
+
+        $prompt .= "Şimdiki İstek: {$message}\n\n";
+        
+        if (!empty($scratchpad)) {
+            $prompt .= "Senin Düşünce Sürecin:\n";
+            foreach ($scratchpad as $step) {
+                $prompt .= "Thought: {$step['thought']}\n";
+                $prompt .= "Action: {$step['action']}\n";
+                $prompt .= "Action Input: " . json_encode($step['action_input'], JSON_UNESCAPED_UNICODE) . "\n";
+                $prompt .= "Observation: {$step['observation']}\n";
             }
         }
+
+        $prompt .= "\nYanıtını mutlaka şu JSON formatında ver (başkaca metin ekleme):\n";
+        $prompt .= "{\n  \"thought\": \"Neden bu eylemi seçtiğini açıkla\",\n  \"action\": \"arac_adi\",\n  \"action_input\": { \"param1\": \"değer1\" }\n}";
         
-        return null;
+        return $prompt;
     }
-    
+
     /**
-     * Metod çağrılarını loglayan yardımcı fonksiyon
+     * Seçilen aracı yürütür
      */
-    protected function loggedMethod(string $requestId, string $methodName, callable $callback)
+    protected function executeTool(string $requestId, string $action, array $data): string
     {
-        Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] {$methodName} metodu başladı");
-        
         try {
-            $result = $callback();
-            
-            Log::channel(self::LOG_CHANNEL)->info("[{$requestId}] {$methodName} metodu tamamlandı", [
-                'result' => is_string($result) ? $result : json_encode($result)
-            ]);
-            
-            return $result;
+            return match($action) {
+                'takvim_sorgulama' => $this->handleCalendarQuery($data),
+                'takvim_ozet' => $this->handleCalendarSummary($data),
+                'yeni_etkinlik' => $this->eventHandler->handleNewEvent($data),
+                'yeni_görev' => $this->taskHandler->handleNewTask($data),
+                'gorev_guncelleme' => $this->handleUpdateRequest($data, 'task'),
+                'etkinlik_guncelleme' => $this->handleUpdateRequest($data, 'event'),
+                'ozet_bilgi' => $this->eventHandler->handleSummaryRequest($data, $this->provider),
+                default => "Hata: '{$action}' adında bir araç bulunamadı."
+            };
         } catch (Exception $e) {
-            Log::channel(self::LOG_CHANNEL)->error("[{$requestId}] {$methodName} metodunda hata", [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            throw $e;
+            return "Araç yürütme hatası: " . $e->getMessage();
         }
     }
     

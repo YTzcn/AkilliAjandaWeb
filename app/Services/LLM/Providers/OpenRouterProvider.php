@@ -43,12 +43,12 @@ class OpenRouterProvider implements ProviderInterface
     }
     
     /**
-     * Kullanıcı mesajını işler ve analiz eder
+     * Kullanıcı mesajını veya ReAct prompt'unu işler ve analiz eder
      * 
-     * @param string $message Kullanıcı mesajı
+     * @param string $prompt Kullanıcı mesajı veya tam ReAct prompt'u
      * @return array İşlenmiş analiz sonucu
      */
-    public function processMessage(string $message): array
+    public function processMessage(string $prompt): array
     {
         try {
             if (!$this->apiKey) {
@@ -56,81 +56,42 @@ class OpenRouterProvider implements ProviderInterface
             }
             
             $currentDate = Carbon::now()->format('Y-m-d H:i:s');
-            $response = $this->callOpenRouter([
-                "model" => $this->model,
-                "messages" => [
+            
+            // ReAct prompt'u mu kontrol et
+            if (str_contains($prompt, 'Thought:') || str_contains($prompt, 'Action:')) {
+                $messages = [
                     [
                         "role" => "system",
-                        "content" => 
-                            "Sen bir Akıllı Ajanda Uygulamasının Asistanısın. " .
-                            "Ana görevin kullanıcıların ajanda işlemlerini yönetmek. " .
-                            "Kısa, profesyonel sohbet yapabilirsin; ancak aşağıdaki kurallara kesinlikle uy:" . "\n" .
-                            "1. Ajanda dışı cevapları en fazla 2 cümleyle sınırlı tut." . "\n" .
-                            "2. Her zaman profesyonel ve saygılı ol." . "\n" .
-                            "3. Sohbet yalnızca selamlaşma, hal hatır sorma, teşekkür ve özür dileme konularını içerebilir." . "\n" .
-                            "4. Asla kişisel konulara, siyasete, dine, spora veya espriye girme." . "\n" .
-                            "5. Sohbet uzarsa nazikçe ajanda konusuna dön." . "\n" .
-                            "6. Belirsiz mesajda ajandayla ilgili ne yapmak istediğini sor."
+                        "content" => "Sen bir Akıllı Ajanda Uygulamasının Asistanısın. ReAct (Reasoning and Acting) prensibiyle çalışmalısın."
                     ],
                     [
                         "role" => "user",
-                        "content" =>
-                            "ÖNEMLİ: Şu anki tarih ve saat: " . $currentDate . 
-                            ". Bu tarihi referans alarak hareket et.\n\n" .
-                            "Kullanıcı mesajı: " . $message . "\n\n" .
-                            "Lütfen şu adımları izle:\n" .
-                            "1. Mesajı analiz et ve işlem tipini belirle: takvim_sorgulama, yeni_etkinlik, yeni_görev, gorev_guncelleme, etkinlik_guncelleme, ozet_bilgi.\n" .
-                            "2. Mesajdaki tarihleri, kişileri ve etkinlik/görev detaylarını yakala.\n" .
-                            "3. İçerik türünü tespit et: etkinlik, görev veya ikisi birden.\n" .
-                            "4. Görev öncelik ve durumunu ifadeden çıkar:\n" .
-                            "   • Öncelik: 1=düşük, 2=orta, 3=yüksek. \"önemli\", \"acil\" vb. → 3; \"önemsiz\", \"vakit buldukça\" vb. → 1; aksi halde 2.\n" .
-                            "   • Durum: pending, in_progress, completed, cancelled. \"başla\", \"çalışıyorum\" → in_progress; \"tamamlandı\", \"bitti\" → completed; \"iptal\", \"vazgeçtim\" → cancelled; aksi halde pending.\n" .
-                            "5. Yanıtını **yalnızca** şu JSON formatında ver (CODE BLOĞU veya ekstra metin yok):\n" .
-                            "{\n" .
-                            "  \"type\": \"işlem_tipi\",\n" .
-                            "  \"data\": {\n" .
-                            "    \"title\": \"Başlık\",\n" .
-                            "    \"start_date\": \"YYYY-MM-DD HH:MM:SS\",\n" .
-                            "    \"end_date\": \"YYYY-MM-DD HH:MM:SS\",\n" .
-                            "    \"due_date\": \"YYYY-MM-DD HH:MM:SS\",\n" .
-                            "    \"description\": \"Açıklama\",\n" .
-                            "    \"location\": \"Konum\",\n" .
-                            "    \"task_id\": \"ID\",\n" .
-                            "    \"event_id\": \"ID\", // Etkinlik güncellemesi için ID
-" .
-                            "    \"all_day\": false,\n" .
-                            "    \"status\": \"pending\",\n" .
-                            "    \"priority\": 2,\n" .
-                            "    \"is_completed\": false,\n" .
-                            "    \"content_type\": \"both\",\n" .
-                            "    \"user_id\": 1\n" .
-                            "  }\n" .
-                            "}\n\n" .
-                            "Tarihlerde \"bugün\", \"yarın\", \"dün\" ifadelerini sırasıyla:\n" .
-                            "- bugün → " . $currentDate . "\n" .
-                            "- yarın → " . Carbon::tomorrow()->format('Y-m-d H:i:s') . "\n" .
-                            "- dün → " . Carbon::yesterday()->format('Y-m-d H:i:s') . "\n" .
-                            "olarak kullan. Hep tam format (YYYY-MM-DD HH:MM:SS) ve verilen " . $currentDate . " referans alınsın.\n\n" .
-                            "ÇOK ÖNEMLİ NOTLAR:\n" .
-                            "1. Takvim sorgulama işleminde MUTLAKA user_id değerini 1 olarak belirle, NULL BIRAKMA!\n" .
-                            "2. Takvim sorgulama işleminde start_date ve end_date değerlerinin her ikisini de doldur, NULL BIRAKMA!\n" .
-                            "3. content_type değerini MUTLAKA doldur - etkinlikler, görevler veya her ikisi (both). NULL BIRAKMA!\n" .
-                            "4. Eğer bir alan için değer belirtilmemişse, o alanı NULL BIRAKMA. Uygun bir varsayılan değer kullan.\n" .
-                            "5. Bugünkü tarihi soruyorsa start_date=" . $currentDate . " ve end_date=" . Carbon::today()->endOfDay()->format('Y-m-d H:i:s') . " olarak ayarla.\n" .
-                            "6. Yarınki tarihi soruyorsa start_date=" . Carbon::tomorrow()->startOfDay()->format('Y-m-d H:i:s') . " ve end_date=" . Carbon::tomorrow()->endOfDay()->format('Y-m-d H:i:s') . " olarak ayarla.\n" .
-                            "7. ÇOK ÖNEMLİ: Görev veya etkinlik güncelleme işleminde (type: gorev_guncelleme veya etkinlik_guncelleme) şunlara dikkat et:\n" .
-                            "    a. Eğer kullanıcı mesajda ID belirtiyorsa (örn: \"#5 numaralı görevi güncelle\", \"etkinlik 12\'nin yerini değiştir\"), task_id veya event_id alanını doldur.\n" .
-                            "    b. Eğer kullanıcı ID yerine başlık belirtiyorsa (örn: \"YGA sunumunu güncelle\", \"Doktor randevusunu taşı\"), task_id ve event_id alanlarını BOŞ BIRAK (null yap), bunun yerine title alanına kullanıcının belirttiği başlığı yaz.\n" .
-                            "    c. Güncellenmesi istenen diğer alanları (location, start_date, status vb.) normal şekilde doldur.\n" .
-                            "8. Eğer kullanıcı görev/etkinlik güncellemesi yapmak istiyor ama ID belirtmemişse, işlem tipini yine gorev_guncelleme/etkinlik_guncelleme olarak belirle, sistem ID'yi bulmaya çalışacak.\n" .
-                            "9. Yanıt oluştururken varsa etkinlik ve görevlerin ID bilgilerini MUTLAKA göster, kullanıcının bu bilgileri görmesi önemlidir."
+                        "content" => $prompt
                     ]
-                ],
+                ];
+            } else {
+                $messages = [
+                    [
+                        "role" => "system",
+                        "content" => "Sen bir Akıllı Ajanda Uygulamasının Asistanısın. Kullanıcılar seninle konuşarak ajanda üzerindeki işlemlerini yapabilirler."
+                    ],
+                    [
+                        "role" => "user",
+                        "content" => "ÖNEMLİ: Şu anki gerçek tarih ve saat: " . $currentDate . " Bu tarihi referans alarak işlem yap.\n" .
+                            "Tarih ile ilgili tüm kararlarında bugün olarak yukarıdaki tarihi kabul et ve buna göre hesaplama yap.\n" .
+                            "Kullanıcı mesajı: " . $prompt . "\n" .
+                            "Lütfen yanıtını ReAct formatında (thought, action, action_input) bir JSON olarak ver. Nihai cevap için action 'final_answer' ve action_input içinde 'message' kullan."
+                    ]
+                ];
+            }
+
+            $response = $this->callOpenRouter([
+                "model" => $this->model,
+                "messages" => $messages,
                 "response_format" => [
                     "type" => "json_object"
                 ]
             ]);
-            
             
             if (!isset($response['choices'][0]['message']['content'])) {
                 throw new Exception("API geçerli bir yanıt döndürmedi");
@@ -140,40 +101,24 @@ class OpenRouterProvider implements ProviderInterface
             $cleanedContent = $this->cleanJsonResponse($content);
             $analysis = json_decode($cleanedContent, true);
             
-            if (!is_array($analysis) || !isset($analysis['type'])) {
-                throw new Exception("AI yanıtı düzgün parse edilemedi: " . $cleanedContent);
+            if (!is_array($analysis)) {
+                // Eğer JSON değilse, düz metni final_answer olarak paketle
+                return [
+                    'thought' => 'Düz metin yanıt alındı.',
+                    'action' => 'final_answer',
+                    'action_input' => ['message' => $content]
+                ];
             }
             
-            // Data kontrolü - bazı durumlarda data alanı boş gelebilir
-            if (!isset($analysis['data']) || !is_array($analysis['data'])) {
-                $analysis['data'] = [];
+            // ReAct formatı için gerekli alanları kontrol et ve dönüştür
+            if (isset($analysis['type']) && !isset($analysis['action'])) {
+                $analysis['action'] = $analysis['type'];
+                $analysis['action_input'] = $analysis['data'] ?? [];
+                $analysis['thought'] = $analysis['thought'] ?? 'İşlem gerçekleştiriliyor.';
             }
-            
-            // Kritik alanların varsayılan değerlerini ata
-            if ($analysis['type'] === 'takvim_sorgulama') {
-                if (!isset($analysis['data']['user_id']) || $analysis['data']['user_id'] === null) {
-                    $analysis['data']['user_id'] = auth()->id() ?? 1;
-                }
-                
-                if (!isset($analysis['data']['content_type']) || $analysis['data']['content_type'] === null) {
-                    $analysis['data']['content_type'] = 'both';
-                }
-                
-                // start_date null ise bugün olarak ayarla
-                if (!isset($analysis['data']['start_date']) || $analysis['data']['start_date'] === null) {
-                    $analysis['data']['start_date'] = Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
-                }
-                
-                // end_date null ise ve start_date varsa start_date ile aynı günün sonu olarak ayarla
-                if ((!isset($analysis['data']['end_date']) || $analysis['data']['end_date'] === null) && isset($analysis['data']['start_date'])) {
-                    $startDate = Carbon::parse($analysis['data']['start_date']);
-                    $analysis['data']['end_date'] = $startDate->copy()->endOfDay()->format('Y-m-d H:i:s');
-                }
-            }
-            
+
             return $analysis;
         } catch (Exception $e) {
-            // Log::error('[OpenRouterProvider] processMessage error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             throw new Exception('OpenRouter mesaj işleme hatası: ' . $e->getMessage());
         }
     }
